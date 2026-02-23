@@ -274,7 +274,7 @@ textarea{min-height:70px;resize:vertical;line-height:1.6;}
 
 <!-- SHEET CITAS -->
 <div class="sheet-overlay" id="sheetOverlay" onclick="closeCitaSheet()"></div>
-<div class="sheet" id="citaSheet">
+<div class="sheet" id="citaSheet" onclick="event.stopPropagation()">
   <div class="sheet-handle"></div>
   <div class="sheet-head">
     <div class="sheet-title" id="sheet-title">📅 Nueva cita</div>
@@ -328,7 +328,7 @@ textarea{min-height:70px;resize:vertical;line-height:1.6;}
 
 <!-- SHEET DISPONIBILIDAD -->
 <div class="sheet-overlay" id="dispOverlay" onclick="closeDispSheet()"></div>
-<div class="sheet" id="dispSheet">
+<div class="sheet" id="dispSheet" onclick="event.stopPropagation()">
   <div class="sheet-handle"></div>
   <div class="sheet-head">
     <div class="sheet-title" id="disp-sheet-title">🟢 Publicar disponibilidad</div>
@@ -532,9 +532,11 @@ function openCitaForm(cita){
   document.getElementById('cita-notify').style.display=cita?'':'none';
   document.getElementById('cita-delete').style.display=cita?'':'none';
   document.getElementById('btn-guardar').innerHTML='💾 Guardar cita';
-  document.getElementById('sheetOverlay').classList.add('show');
-  document.getElementById('citaSheet').classList.add('show');
-  document.body.style.overflow='hidden';
+  setTimeout(function(){
+    document.getElementById('sheetOverlay').classList.add('show');
+    document.getElementById('citaSheet').classList.add('show');
+    document.body.style.overflow='hidden';
+  }, 10);
 }
 
 function closeCitaSheet(){
@@ -701,9 +703,12 @@ function openDispForm(d) {
   document.getElementById('disp-activo').checked = d ? d.activo === 'true' : true;
   document.getElementById('disp-delete').style.display = d ? '' : 'none';
   document.getElementById('btn-disp-guardar').innerHTML = '💾 Guardar disponibilidad';
-  document.getElementById('dispOverlay').classList.add('show');
-  document.getElementById('dispSheet').classList.add('show');
-  document.body.style.overflow = 'hidden';
+  // Delay 10ms para que el click que abrió el form no se propague al overlay
+  setTimeout(function(){
+    document.getElementById('dispOverlay').classList.add('show');
+    document.getElementById('dispSheet').classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }, 10);
 }
 
 function closeDispSheet() {
