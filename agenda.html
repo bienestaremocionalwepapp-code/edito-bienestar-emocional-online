@@ -149,11 +149,16 @@ textarea{min-height:70px;resize:vertical;line-height:1.6;}
 @keyframes toastIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
 .sec-header{padding:0 1rem;margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between;}
 .sec-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);}
+/* DESK NAV BUTTONS */
+.desk-nav-btn{padding:.38rem .85rem;border-radius:50px;font-family:'Manrope',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:transparent;color:var(--mid);white-space:nowrap;transition:all .2s;}
+.desk-nav-btn:hover{border-color:var(--mi);color:var(--mi);}
+.desk-nav-btn.on{background:linear-gradient(135deg,var(--ri),var(--mi));color:#fff;border-color:transparent;}
 /* DESKTOP */
 @media(min-width:768px){
   .main{padding-top:calc(var(--topbar)+1.5rem);padding-bottom:2rem;max-width:960px;margin:0 auto;padding-left:1.5rem;padding-right:1.5rem;}
   .bottom-nav{display:none;}
   .desk-btns{display:flex!important;}
+  .desk-nav{display:flex!important;}
   .cal-wrap,.day-panel,.sec-header,.filtro-wrap{padding:0;}
   .cal-layout{display:grid;grid-template-columns:1fr 300px;gap:1.4rem;align-items:start;}
   .todas-card{margin:0;}
@@ -170,6 +175,12 @@ textarea{min-height:70px;resize:vertical;line-height:1.6;}
   <div class="tb-l">
     <div class="tb-logo">📅</div>
     <div class="tb-brand">Agenda <span>Bienestar Emocional</span></div>
+    <!-- NAV DESKTOP: visible solo en >=768px -->
+    <nav class="desk-nav" style="display:none;gap:.3rem;margin-left:1.2rem;">
+      <button class="desk-nav-btn on" id="dnb-cal"   onclick="showView('cal',null);deskNavOn('dnb-cal')">📅 Calendario</button>
+      <button class="desk-nav-btn"    id="dnb-disp"  onclick="showView('disp',null);deskNavOn('dnb-disp')">🟢 Disponibilidad</button>
+      <button class="desk-nav-btn"    id="dnb-todas" onclick="showView('todas',null);deskNavOn('dnb-todas')">📋 Todas</button>
+    </nav>
   </div>
   <div class="tb-r">
     <div class="uchip">
@@ -177,6 +188,7 @@ textarea{min-height:70px;resize:vertical;line-height:1.6;}
       <div><div class="uname" id="uname">—</div></div>
     </div>
     <div class="desk-btns" style="display:none;gap:.4rem;">
+      <button class="btn btn-primary btn-sm" style="width:auto;" onclick="openCitaForm(null)">＋ Nueva cita</button>
       <a href="https://bienestaremocionalwepapp-code.github.io/editor-bienestar-emocional-online/" class="btn btn-ghost btn-sm" style="width:auto;text-decoration:none;">← Editor</a>
       <button class="btn btn-danger btn-sm" style="width:auto;" onclick="doLogout()">🚪 Salir</button>
     </div>
@@ -373,6 +385,11 @@ var currentUser=null, inactTimer=null;
 function resetInact(){clearTimeout(inactTimer);inactTimer=setTimeout(function(){toast('Sesión cerrada por inactividad','warn');doLogout();},INACT_MS);}
 function doLogout(){clearTimeout(inactTimer);sessionStorage.removeItem('be_sess');window.location.href=EDITOR;}
 
+function deskNavOn(id){
+  document.querySelectorAll('.desk-nav-btn').forEach(function(b){b.classList.remove('on');});
+  var el=document.getElementById(id);if(el)el.classList.add('on');
+}
+
 var agYear=new Date().getFullYear(),agMonth=new Date().getMonth();
 var agCitas=[],agSelectedDate=null,agEditingId=null,filtroActualVal='';
 var MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -411,6 +428,7 @@ function showView(name,el){
   if(name==='disp') loadDisp();
   document.querySelectorAll('.bn-item').forEach(function(b){b.classList.remove('on');});
   if(el)el.classList.add('on');
+  deskNavOn('dnb-'+name);
 }
 
 function agMes(dir){
