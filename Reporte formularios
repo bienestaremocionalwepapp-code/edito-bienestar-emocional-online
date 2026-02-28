@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reporte Formularios — Bienestar Emocional</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--rp:#FFE5F0;--ri:#FF85C0;--mp:#E8D5FF;--mi:#A67FFF;--card:#fff;--bg:#f5f2ff;--border:#ede8ff;--mid:#5A5570;--text:#2D2A3D;--ok:#22c55e;--err:#ef4444;--warn:#f59e0b;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:.8rem 1.4rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(166,127,255,.08);}
+.tb-l{display:flex;align-items:center;gap:.7rem;}
+.tb-logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--ri),var(--mi));display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.tb-brand{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:var(--text);}
+.tb-brand span{color:var(--mi);}
+.main{max-width:1100px;margin:0 auto;padding:1.5rem 1.2rem 3rem;}
+.filtros-panel{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:1.2rem 1.4rem;margin-bottom:1.2rem;display:flex;flex-wrap:wrap;gap:.9rem;align-items:flex-end;}
+.fg{display:flex;flex-direction:column;gap:.3rem;}
+.fg label{font-size:.68rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.08em;}
+input[type=date],select{padding:.6rem .9rem;border:1.5px solid var(--border);border-radius:10px;font-family:'Manrope',sans-serif;font-size:.88rem;color:var(--text);background:#fafafa;outline:none;transition:all .2s;}
+input[type=date]:focus,select:focus{border-color:var(--mi);background:#fff;box-shadow:0 0 0 3px rgba(166,127,255,.1);}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem 1.2rem;border-radius:50px;font-family:'Manrope',sans-serif;font-size:.84rem;font-weight:700;cursor:pointer;border:none;transition:all .2s;white-space:nowrap;}
+.btn-primary{background:linear-gradient(135deg,var(--ri),var(--mi));color:#fff;box-shadow:0 4px 14px rgba(166,127,255,.35);}
+.btn-primary:hover{transform:translateY(-1px);}
+.btn-ghost{background:transparent;color:var(--mid);border:1.5px solid var(--border);}
+.btn-ghost:hover{border-color:var(--mi);color:var(--mi);}
+.btn-sm{padding:.4rem .9rem;font-size:.78rem;}
+.stats-bar{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.1rem;}
+.stat-chip{background:var(--card);border:1.5px solid var(--border);border-radius:50px;padding:.32rem .9rem;font-size:.76rem;font-weight:600;color:var(--mid);}
+.stat-chip b{color:var(--text);}
+.stat-chip.hi{border-color:var(--mi);color:var(--mi);}
+.stat-chip.hi b{color:var(--mi);}
+.skel{background:linear-gradient(90deg,var(--border) 25%,var(--mp) 50%,var(--border) 75%);background-size:200% 100%;animation:sk 1.5s infinite;border-radius:16px;height:120px;margin-bottom:.8rem;}
+@keyframes sk{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+.table-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;}
+.table-head-bar{padding:.85rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;}
+.table-head-bar h2{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;}
+.table-head-bar small{font-size:.72rem;color:var(--mid);}
+.tscroll{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:linear-gradient(135deg,rgba(232,213,255,.3),rgba(255,229,240,.15));}
+th{text-align:left;padding:.7rem .9rem;font-size:.67rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:.72rem .9rem;font-size:.81rem;border-bottom:1px solid rgba(237,232,255,.5);vertical-align:top;line-height:1.5;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(245,242,255,.4);}
+.tbadge{display:inline-flex;align-items:center;padding:.13rem .55rem;border-radius:50px;font-size:.65rem;font-weight:700;white-space:nowrap;}
+.t-cita{background:#fdf4ff;color:#9333ea;}
+.t-empresa{background:#eff6ff;color:#2563eb;}
+.t-escuela{background:#f0fdf4;color:#16a34a;}
+.s-pendiente{background:#fff7ed;color:#ea580c;}
+.s-espera{background:#eff6ff;color:#2563eb;}
+.s-atendido{background:#f0fdf4;color:#16a34a;}
+.s-cancelado{background:#fef2f2;color:#dc2626;}
+.motivo-txt{max-width:200px;font-size:.74rem;color:var(--mid);line-height:1.4;}
+.empty-cell{text-align:center;padding:3.5rem 1rem;color:var(--mid);font-size:.85rem;}
+.toasts{position:fixed;bottom:1.5rem;right:1.5rem;display:flex;flex-direction:column;gap:.5rem;z-index:9999;pointer-events:none;max-width:320px;}
+.toast{background:#1e1b2e;color:#fff;padding:.8rem 1.2rem;border-radius:12px;font-size:.84rem;font-weight:600;display:flex;align-items:center;gap:.5rem;box-shadow:0 8px 28px rgba(0,0,0,.3);animation:tin .3s ease;}
+@keyframes tin{from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:none;}}
+@media print{
+  .topbar,.filtros-panel,.stats-bar,.no-print,.toasts{display:none!important;}
+  body{background:#fff;}
+  .main{padding:0;max-width:100%;}
+  .table-wrap{border:1pt solid #ccc;border-radius:0;}
+  .print-header{display:block!important;}
+  thead tr{background:#f0e8ff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .tbadge{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  tr{page-break-inside:avoid;}
+}
+.print-header{display:none;padding:.4cm 0 .35cm;border-bottom:2pt solid #A67FFF;margin-bottom:.35cm;}
+.print-header h1{font-family:'Syne',sans-serif;font-size:13pt;color:#2D2A3D;}
+.print-header p{font-size:8pt;color:#5A5570;margin-top:3pt;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-l">
+    <div class="tb-logo">📊</div>
+    <div class="tb-brand">Reporte <span>Formularios</span></div>
+  </div>
+  <div style="display:flex;gap:.5rem;">
+    <button class="btn btn-ghost btn-sm no-print" onclick="cargar()">↺ Recargar</button>
+    <button class="btn btn-primary btn-sm no-print" onclick="imprimirPDF()">🖨️ Exportar PDF</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="filtros-panel no-print">
+    <div class="fg">
+      <label>Fecha desde</label>
+      <input type="date" id="f-desde">
+    </div>
+    <div class="fg">
+      <label>Fecha hasta</label>
+      <input type="date" id="f-hasta">
+    </div>
+    <div class="fg">
+      <label>Tipo de servicio</label>
+      <select id="f-tipo">
+        <option value="todos">Todos los tipos</option>
+        <option value="cita">🟣 Citas personales</option>
+        <option value="empresa">🔵 Empresas</option>
+        <option value="escuela">🟢 Escuelas</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:.5rem;align-items:flex-end;margin-left:auto;">
+      <button class="btn btn-ghost btn-sm" onclick="limpiar()">✕ Limpiar</button>
+      <button class="btn btn-primary btn-sm" onclick="aplicar()">🔍 Filtrar</button>
+    </div>
+  </div>
+
+  <div class="stats-bar no-print" id="stats" style="display:none;">
+    <div class="stat-chip hi">Total: <b id="s-tot">0</b></div>
+    <div class="stat-chip">🟣 Citas: <b id="s-cita">0</b></div>
+    <div class="stat-chip">🔵 Empresas: <b id="s-emp">0</b></div>
+    <div class="stat-chip">🟢 Escuelas: <b id="s-esc">0</b></div>
+  </div>
+
+  <div id="loading">
+    <div class="skel"></div><div class="skel"></div>
+  </div>
+
+  <div class="table-wrap" id="wrap" style="display:none;">
+    <div class="print-header" id="ph">
+      <h1>📋 Reporte de Formularios — Bienestar Emocional</h1>
+      <p id="ph-txt"></p>
+    </div>
+    <div class="table-head-bar">
+      <div>
+        <h2>📋 Listado de formularios</h2>
+        <small id="sub-txt"></small>
+      </div>
+      <small id="count-txt" style="color:var(--mid);font-weight:600;"></small>
+    </div>
+    <div class="tscroll">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Nombre</th>
+            <th>Teléfono</th>
+            <th>Correo</th>
+            <th>Entidad</th>
+            <th>Servicio</th>
+            <th>Estado</th>
+            <th>Motivo</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+'use strict';
+/* ══ Misma config que el HTML original ══════════════════ */
+var PROXY = 'https://script.google.com/macros/s/AKfycbz-_1X-c3aZ2lJ4N6m3R5tP2l2cznIs7Seuvkb5X5J1oPVrIXDwkEHi936b4dXg5JxO/exec';
+
+var todos    = [];
+var filtrado = [];
+
+/* ══ Misma función apiGet que el original ═══════════════ */
+function apiGet(tab){
+  return fetch(PROXY+'?tab='+encodeURIComponent(tab),{redirect:'follow'})
+    .then(function(r){return r.text();})
+    .then(function(t){var j=JSON.parse(t);if(!j.ok)throw new Error(j.error||'Error');return j;});
+}
+
+/* ══ Init ═══════════════════════════════════════════════ */
+(function(){
+  var hoy=new Date(),d30=new Date();
+  d30.setDate(hoy.getDate()-30);
+  document.getElementById('f-hasta').value=fmtDate(hoy);
+  document.getElementById('f-desde').value=fmtDate(d30);
+  cargar();
+})();
+
+/* ══ Cargar — mismo tab "FormulariosPendientes" ═════════ */
+function cargar(){
+  document.getElementById('loading').style.display='';
+  document.getElementById('wrap').style.display='none';
+  document.getElementById('stats').style.display='none';
+  apiGet('FormulariosPendientes')
+    .then(function(j){
+      todos=j.formularios||[];
+      document.getElementById('loading').style.display='none';
+      aplicar();
+      toast('✅ '+todos.length+' registros cargados','ok');
+    })
+    .catch(function(e){
+      document.getElementById('loading').style.display='none';
+      document.getElementById('wrap').style.display='';
+      document.getElementById('tbody').innerHTML='<tr><td colspan="10" class="empty-cell">⚠️ Error al cargar: '+esc(e.message)+'</td></tr>';
+      toast('Error: '+e.message,'err');
+    });
+}
+
+/* ══ Filtrar ════════════════════════════════════════════ */
+function aplicar(){
+  var desde=document.getElementById('f-desde').value;
+  var hasta=document.getElementById('f-hasta').value;
+  var tipo =document.getElementById('f-tipo').value;
+  filtrado=todos.filter(function(f){
+    if(tipo!=='todos'&&f._tipo!==tipo)return false;
+    if((desde||hasta)&&f.timestamp){
+      var d=new Date(f.timestamp);
+      if(desde&&d<new Date(desde+'T00:00:00'))return false;
+      if(hasta&&d>new Date(hasta+'T23:59:59'))return false;
+    }
+    return true;
+  });
+  renderTabla();
+  renderStats();
+}
+
+function limpiar(){
+  var hoy=new Date(),d30=new Date();
+  d30.setDate(hoy.getDate()-30);
+  document.getElementById('f-hasta').value=fmtDate(hoy);
+  document.getElementById('f-desde').value=fmtDate(d30);
+  document.getElementById('f-tipo').value='todos';
+  aplicar();
+}
+
+/* ══ Render ═════════════════════════════════════════════ */
+function renderTabla(){
+  var tbody=document.getElementById('tbody');
+  document.getElementById('wrap').style.display='';
+  var desde=document.getElementById('f-desde').value;
+  var hasta=document.getElementById('f-hasta').value;
+  var tipo =document.getElementById('f-tipo').value;
+  var tipoLabel={todos:'Todos los tipos',cita:'Citas personales',empresa:'Empresas',escuela:'Escuelas'};
+  var sub='';
+  if(desde&&hasta)sub='Del '+fmtHuman(desde)+' al '+fmtHuman(hasta);
+  else if(desde)sub='Desde '+fmtHuman(desde);
+  else if(hasta)sub='Hasta '+fmtHuman(hasta);
+  else sub='Todos los registros';
+  sub+=' · '+(tipoLabel[tipo]||tipo);
+  document.getElementById('sub-txt').textContent=sub;
+  document.getElementById('count-txt').textContent=filtrado.length+' registro'+(filtrado.length!==1?'s':'');
+  document.getElementById('ph-txt').textContent=sub+' · Total: '+filtrado.length+' · Generado: '+new Date().toLocaleString('es-MX');
+  if(!filtrado.length){
+    tbody.innerHTML='<tr><td colspan="10" class="empty-cell">📭 Sin resultados para los filtros aplicados.</td></tr>';
+    return;
+  }
+  var tm={cita:['🟣','t-cita','Cita personal'],empresa:['🔵','t-empresa','Empresa'],escuela:['🟢','t-escuela','Escuela']};
+  var sc={'Pendiente':'s-pendiente','En espera':'s-espera','Atendido':'s-atendido','Cancelado':'s-cancelado'};
+  tbody.innerHTML=filtrado.map(function(f,i){
+    var t=tm[f._tipo]||['📋','t-cita',f._tipo||'—'];
+    var ts='';
+    if(f.timestamp){try{ts=new Date(f.timestamp).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});}catch(e){ts=(f.timestamp||'').substring(0,10);}}
+    var est=f.estado||'Pendiente';
+    var ec=sc[est]||'s-pendiente';
+    var entidad=esc(f.entidad||f.nombre_empresa||f.nombre_escuela||'—');
+    var mot=esc((f.motivo||'').substring(0,100))+(f.motivo&&f.motivo.length>100?'…':'');
+    return '<tr>'
+      +'<td style="color:var(--mid);font-size:.7rem;">'+(i+1)+'</td>'
+      +'<td style="white-space:nowrap;font-size:.77rem;">'+(ts||'—')+'</td>'
+      +'<td><span class="tbadge '+t[1]+'">'+t[0]+' '+t[2]+'</span></td>'
+      +'<td><strong>'+esc(f.nombre||'—')+'</strong></td>'
+      +'<td style="white-space:nowrap;">'+esc(f.telefono||'—')+'</td>'
+      +'<td style="font-size:.74rem;word-break:break-all;">'+esc(f.correo||'—')+'</td>'
+      +'<td style="font-size:.79rem;">'+entidad+'</td>'
+      +'<td style="font-size:.79rem;">'+esc(f.servicio||'—')+'</td>'
+      +'<td><span class="tbadge '+ec+'">'+esc(est)+'</span></td>'
+      +'<td class="motivo-txt">'+(mot||'—')+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+function renderStats(){
+  document.getElementById('stats').style.display='flex';
+  document.getElementById('s-tot').textContent =filtrado.length;
+  document.getElementById('s-cita').textContent=filtrado.filter(function(f){return f._tipo==='cita';}).length;
+  document.getElementById('s-emp').textContent =filtrado.filter(function(f){return f._tipo==='empresa';}).length;
+  document.getElementById('s-esc').textContent =filtrado.filter(function(f){return f._tipo==='escuela';}).length;
+}
+
+/* ══ PDF ════════════════════════════════════════════════ */
+function imprimirPDF(){
+  if(!filtrado.length){toast('Sin datos para exportar','warn');return;}
+  window.print();
+}
+
+/* ══ Utils ══════════════════════════════════════════════ */
+function fmtDate(d){return d.toISOString().substring(0,10);}
+function fmtHuman(s){
+  if(!s)return '';
+  try{return new Date(s+'T12:00:00').toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});}
+  catch(e){return s;}
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function toast(msg,type){
+  var c=document.getElementById('toasts'),t=document.createElement('div');
+  t.className='toast';
+  t.style.borderLeft='3px solid '+(type==='ok'?'var(--ok)':type==='err'?'var(--err)':'var(--warn)');
+  t.textContent=msg;c.appendChild(t);
+  setTimeout(function(){t.style.opacity='0';t.style.transform='translateX(40px)';t.style.transition='.3s';setTimeout(function(){t.remove();},350);},3500);
+}
+</script>
+</body>
+</html>
