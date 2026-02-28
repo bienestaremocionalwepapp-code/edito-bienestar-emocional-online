@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consulta Agenda — Bienestar Emocional</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--rp:#FFE5F0;--ri:#FF85C0;--mp:#E8D5FF;--mi:#A67FFF;--card:#fff;--bg:#f5f2ff;--border:#ede8ff;--mid:#5A5570;--text:#2D2A3D;--ok:#22c55e;--err:#ef4444;--warn:#f59e0b;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── Topbar ── */
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:.8rem 1.4rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(166,127,255,.08);}
+.tb-l{display:flex;align-items:center;gap:.7rem;}
+.tb-logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--ri),var(--mi));display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.tb-brand{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;}
+.tb-brand span{color:var(--mi);}
+
+/* ── Main ── */
+.main{max-width:1000px;margin:0 auto;padding:1.5rem 1.2rem 3rem;}
+
+/* ── Panel filtros ── */
+.filtros-panel{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:1.1rem 1.3rem;margin-bottom:1.1rem;}
+.filtros-title{font-size:.68rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;}
+.filtros-row{display:flex;flex-wrap:wrap;gap:.7rem;align-items:flex-end;}
+.fg{display:flex;flex-direction:column;gap:.28rem;}
+.fg label{font-size:.65rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.08em;}
+input[type=date],select{padding:.55rem .85rem;border:1.5px solid var(--border);border-radius:9px;font-family:'Manrope',sans-serif;font-size:.86rem;color:var(--text);background:#fafafa;outline:none;transition:all .2s;}
+input[type=date]:focus,select:focus{border-color:var(--mi);background:#fff;box-shadow:0 0 0 3px rgba(166,127,255,.1);}
+.filtros-actions{display:flex;gap:.45rem;align-items:flex-end;margin-left:auto;flex-wrap:wrap;}
+
+/* ── Botones ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;padding:.58rem 1.1rem;border-radius:50px;font-family:'Manrope',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;border:none;transition:all .2s;white-space:nowrap;}
+.btn-primary{background:linear-gradient(135deg,var(--ri),var(--mi));color:#fff;box-shadow:0 4px 14px rgba(166,127,255,.3);}
+.btn-primary:hover{transform:translateY(-1px);}
+.btn-ghost{background:transparent;color:var(--mid);border:1.5px solid var(--border);}
+.btn-ghost:hover{border-color:var(--mi);color:var(--mi);}
+.btn-pdf{background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;box-shadow:0 4px 14px rgba(244,63,94,.25);}
+.btn-pdf:hover{transform:translateY(-1px);}
+
+/* ── Stats ── */
+.stats-bar{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;}
+.stat-chip{background:var(--card);border:1.5px solid var(--border);border-radius:50px;padding:.28rem .85rem;font-size:.74rem;font-weight:600;color:var(--mid);}
+.stat-chip b{color:var(--text);}
+.stat-chip.hi{border-color:var(--mi);color:var(--mi);}
+.stat-chip.hi b{color:var(--mi);}
+
+/* ── Skeleton ── */
+.skel{background:linear-gradient(90deg,var(--border) 25%,var(--mp) 50%,var(--border) 75%);background-size:200% 100%;animation:sk 1.5s infinite;border-radius:14px;height:110px;margin-bottom:.7rem;}
+@keyframes sk{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+/* ── Tabla ── */
+.table-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;}
+.table-bar{padding:.85rem 1.1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;}
+.table-bar h2{font-family:'Syne',sans-serif;font-size:.93rem;font-weight:800;}
+.table-bar small{font-size:.71rem;color:var(--mid);}
+.tscroll{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:linear-gradient(135deg,rgba(232,213,255,.3),rgba(255,229,240,.15));}
+th{text-align:left;padding:.65rem .9rem;font-size:.65rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:.7rem .9rem;font-size:.82rem;border-bottom:1px solid rgba(237,232,255,.45);vertical-align:middle;line-height:1.45;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(245,242,255,.4);}
+
+/* ── Badges ── */
+.tbadge{display:inline-flex;align-items:center;padding:.13rem .52rem;border-radius:50px;font-size:.65rem;font-weight:700;white-space:nowrap;}
+.est-Pendiente{background:#fffbeb;color:#d97706;}
+.est-Confirmada{background:#f0fdf4;color:#16a34a;}
+.est-Cancelada{background:#f3f4f6;color:#6b7280;}
+.orig-Manual{background:#f0f9ff;color:#0369a1;}
+.orig-Formulario{background:#fdf4ff;color:#9333ea;}
+.orig-Be-Welcome{background:#fff7ed;color:#ea580c;}
+.orig-WhatsApp{background:#f0fdf4;color:#16a34a;}
+
+/* ── Empty ── */
+.empty-row td{text-align:center;padding:3rem 1rem;color:var(--mid);font-size:.84rem;}
+
+/* ── Toasts ── */
+.toasts{position:fixed;bottom:1.5rem;right:1.5rem;display:flex;flex-direction:column;gap:.5rem;z-index:9999;pointer-events:none;max-width:300px;}
+.toast{background:#1e1b2e;color:#fff;padding:.75rem 1.1rem;border-radius:12px;font-size:.83rem;font-weight:600;border-left:3px solid transparent;box-shadow:0 8px 24px rgba(0,0,0,.3);animation:tin .3s ease;}
+@keyframes tin{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:none;}}
+
+/* ── Spinner ── */
+.spin{display:inline-block;width:13px;height:13px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg);}}
+
+/* ═══════════════════════════════
+   PRINT / PDF
+═══════════════════════════════ */
+@media print{
+  .topbar,.filtros-panel,.stats-bar,.no-print,.toasts{display:none!important;}
+  body{background:#fff;}
+  .main{padding:0;max-width:100%;}
+  .table-wrap{border:1pt solid #ccc;border-radius:0;box-shadow:none;}
+  .table-bar{padding:.4cm .5cm;}
+  thead tr{background:#f0e8ff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .tbadge{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  tr{page-break-inside:avoid;}
+  .print-header{display:block!important;}
+}
+.print-header{
+  display:none;padding:.45cm 0 .4cm;
+  border-bottom:2pt solid #A67FFF;margin-bottom:.4cm;
+}
+.print-header h1{font-family:'Syne',sans-serif;font-size:13pt;color:#2D2A3D;}
+.print-header p{font-size:8pt;color:#5A5570;margin-top:4pt;line-height:1.6;}
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="tb-l">
+    <div class="tb-logo">📊</div>
+    <div class="tb-brand">Consulta <span>Agenda</span></div>
+  </div>
+  <div style="display:flex;gap:.45rem;" class="no-print">
+    <button class="btn btn-ghost" style="font-size:.76rem;padding:.45rem .9rem;" onclick="cargar()">↺ Recargar</button>
+    <button class="btn btn-pdf"   style="font-size:.76rem;padding:.45rem .9rem;" onclick="exportarPDF()">🖨️ Exportar PDF</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Panel de filtros -->
+  <div class="filtros-panel no-print">
+    <div class="filtros-title">🔍 Filtros</div>
+    <div class="filtros-row">
+      <div class="fg">
+        <label>Mes / Año</label>
+        <input type="month" id="f-mes" style="padding:.55rem .85rem;border:1.5px solid var(--border);border-radius:9px;font-family:'Manrope',sans-serif;font-size:.86rem;color:var(--text);background:#fafafa;outline:none;">
+      </div>
+      <div class="fg">
+        <label>Fecha desde</label>
+        <input type="date" id="f-desde">
+      </div>
+      <div class="fg">
+        <label>Fecha hasta</label>
+        <input type="date" id="f-hasta">
+      </div>
+      <div class="fg">
+        <label>Estado</label>
+        <select id="f-estado">
+          <option value="">Todos los estados</option>
+          <option value="Pendiente">⏳ Pendiente</option>
+          <option value="Confirmada">✅ Confirmada</option>
+          <option value="Cancelada">❌ Cancelada</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Origen</label>
+        <select id="f-origen">
+          <option value="">Todos los orígenes</option>
+          <option value="Manual">✏️ Manual</option>
+          <option value="Formulario">📋 Formulario</option>
+          <option value="Be-Welcome">🌐 Be-Welcome</option>
+          <option value="WhatsApp">💬 WhatsApp</option>
+        </select>
+      </div>
+      <div class="filtros-actions">
+        <button class="btn btn-ghost" onclick="limpiar()">✕ Limpiar</button>
+        <button class="btn btn-primary" id="btn-buscar" onclick="buscar()">🔍 Buscar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-bar no-print" id="stats" style="display:none;">
+    <div class="stat-chip hi">Total: <b id="s-tot">0</b></div>
+    <div class="stat-chip">⏳ Pendiente: <b id="s-pend">0</b></div>
+    <div class="stat-chip">✅ Confirmada: <b id="s-conf">0</b></div>
+    <div class="stat-chip">❌ Cancelada: <b id="s-canc">0</b></div>
+  </div>
+
+  <!-- Skeleton loading -->
+  <div id="loading" style="display:none;">
+    <div class="skel"></div><div class="skel"></div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-wrap" id="wrap" style="display:none;">
+
+    <!-- Encabezado solo visible al imprimir -->
+    <div class="print-header">
+      <h1>📋 Consulta de Agenda — Bienestar Emocional</h1>
+      <p id="ph-txt"></p>
+    </div>
+
+    <div class="table-bar">
+      <div>
+        <h2>📋 Citas encontradas</h2>
+        <small id="sub-txt" style="color:var(--mid);"></small>
+      </div>
+      <small id="count-txt" style="color:var(--mid);font-weight:700;" class="no-print"></small>
+    </div>
+
+    <div class="tscroll">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Nombre</th>
+            <th>Teléfono</th>
+            <th>Servicio</th>
+            <th>Estado</th>
+            <th>Origen</th>
+            <th>Motivo / Notas</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+'use strict';
+/* ══ Mismo PROXY que el original ══════════════════════════ */
+var PROXY = 'https://script.google.com/macros/s/AKfycbz-_1X-c3aZ2lJ4N6m3R5tP2l2cznIs7Seuvkb5X5J1oPVrIXDwkEHi936b4dXg5JxO/exec';
+
+var MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+/* datos cargados en la búsqueda actual */
+var citasCargadas = [];
+
+/* ══ Init — poner mes actual por defecto ══════════════════ */
+(function(){
+  var hoy = new Date();
+  var mm  = String(hoy.getMonth()+1).padStart(2,'0');
+  document.getElementById('f-mes').value = hoy.getFullYear()+'-'+mm;
+})();
+
+/* ══ Mismo patrón fetch que el original (tab=Agenda&mes=) ══ */
+function cargar(){
+  var mes = document.getElementById('f-mes').value; // "YYYY-MM"
+  if(!mes){ toast('Selecciona un mes','warn'); return; }
+
+  var btn = document.getElementById('btn-buscar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Cargando…';
+
+  document.getElementById('loading').style.display = '';
+  document.getElementById('wrap').style.display    = 'none';
+  document.getElementById('stats').style.display   = 'none';
+
+  fetch(PROXY+'?tab=Agenda&mes='+encodeURIComponent(mes), {redirect:'follow'})
+    .then(function(r){ return r.text(); })
+    .then(function(t){
+      var j = JSON.parse(t);
+      if(!j.ok) throw new Error(j.error || 'Error del servidor');
+      citasCargadas = j.citas || [];
+      document.getElementById('loading').style.display = 'none';
+      aplicarFiltros();
+      toast('✅ '+citasCargadas.length+' citas cargadas','ok');
+    })
+    .catch(function(e){
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('wrap').style.display    = '';
+      document.getElementById('tbody').innerHTML =
+        '<tr class="empty-row"><td colspan="9">⚠️ Error: '+esc(e.message)+'</td></tr>';
+      toast('Error: '+e.message,'err');
+    })
+    .finally(function(){
+      btn.disabled = false;
+      btn.innerHTML = '🔍 Buscar';
+    });
+}
+
+/* ══ buscar = cargar + filtrar ══════════════════════════════ */
+function buscar(){ cargar(); }
+
+/* ══ Aplicar filtros sobre citasCargadas ════════════════════ */
+function aplicarFiltros(){
+  var desde  = document.getElementById('f-desde').value;
+  var hasta  = document.getElementById('f-hasta').value;
+  var estado = document.getElementById('f-estado').value;
+  var origen = document.getElementById('f-origen').value;
+
+  var lista = citasCargadas.filter(function(c){
+    if(estado && c.estado !== estado) return false;
+    if(origen && (c.origen||'Manual') !== origen) return false;
+    if(desde  && c.fecha < desde) return false;
+    if(hasta  && c.fecha > hasta) return false;
+    return true;
+  });
+
+  lista.sort(function(a,b){ return (a.fecha+a.hora).localeCompare(b.fecha+b.hora); });
+
+  renderTabla(lista);
+  renderStats(lista);
+  actualizarHeaderPDF(lista);
+}
+
+/* ══ Limpiar filtros secundarios (mantiene el mes) ═════════ */
+function limpiar(){
+  document.getElementById('f-desde').value  = '';
+  document.getElementById('f-hasta').value  = '';
+  document.getElementById('f-estado').value = '';
+  document.getElementById('f-origen').value = '';
+  if(citasCargadas.length) aplicarFiltros();
+}
+
+/* ══ Render tabla ═══════════════════════════════════════════ */
+function renderTabla(lista){
+  document.getElementById('wrap').style.display = '';
+  var tbody = document.getElementById('tbody');
+
+  /* subtítulo */
+  var desde  = document.getElementById('f-desde').value;
+  var hasta  = document.getElementById('f-hasta').value;
+  var estado = document.getElementById('f-estado').value;
+  var origen = document.getElementById('f-origen').value;
+  var mes    = document.getElementById('f-mes').value;
+  var partes = [];
+  if(mes){ var p=mes.split('-'); partes.push(MESES[parseInt(p[1])-1]+' '+p[0]); }
+  if(desde && hasta) partes.push('Del '+fmtHuman(desde)+' al '+fmtHuman(hasta));
+  else if(desde) partes.push('Desde '+fmtHuman(desde));
+  else if(hasta) partes.push('Hasta '+fmtHuman(hasta));
+  if(estado) partes.push('Estado: '+estado);
+  if(origen) partes.push('Origen: '+origen);
+  document.getElementById('sub-txt').textContent   = partes.join(' · ');
+  document.getElementById('count-txt').textContent = lista.length+' registro'+(lista.length!==1?'s':'');
+
+  if(!lista.length){
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="9">📭 Sin citas para los filtros aplicados.</td></tr>';
+    return;
+  }
+
+  var origenEmoji = {'Manual':'✏️ ','Formulario':'📋 ','Be-Welcome':'🌐 ','WhatsApp':'💬 '};
+
+  tbody.innerHTML = lista.map(function(c,i){
+    var orig = c.origen||'Manual';
+    var mot  = esc((c.motivo||'').substring(0,90)) + (c.motivo && c.motivo.length>90?'…':'');
+    return '<tr>'
+      +'<td style="color:var(--mid);font-size:.7rem;">'+(i+1)+'</td>'
+      +'<td style="white-space:nowrap;font-size:.79rem;"><strong>'+fmtFechaCorta(c.fecha)+'</strong></td>'
+      +'<td style="white-space:nowrap;font-family:\'Syne\',sans-serif;font-weight:700;color:var(--mi);">'+(c.hora||'—')+'</td>'
+      +'<td><strong style="font-size:.85rem;">'+esc(c.nombre||'—')+'</strong>'
+        +(c.telefono?'<br><span style="font-size:.72rem;color:var(--mid);">📱 '+esc(c.telefono)+'</span>':'')+'</td>'
+      +'<td style="font-size:.78rem;white-space:nowrap;">'+esc(c.telefono||'—')+'</td>'
+      +'<td style="font-size:.79rem;">'+esc(c.servicio||'—')+'</td>'
+      +'<td><span class="tbadge est-'+esc(c.estado||'Pendiente')+'">'+esc(c.estado||'Pendiente')+'</span></td>'
+      +'<td><span class="tbadge orig-'+esc(orig)+'">'+(origenEmoji[orig]||'')+esc(orig)+'</span></td>'
+      +'<td style="font-size:.75rem;color:var(--mid);max-width:180px;">'+(mot||'—')+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+/* ══ Stats ══════════════════════════════════════════════════ */
+function renderStats(lista){
+  document.getElementById('stats').style.display = 'flex';
+  document.getElementById('s-tot').textContent  = lista.length;
+  document.getElementById('s-pend').textContent = lista.filter(function(c){return c.estado==='Pendiente';}).length;
+  document.getElementById('s-conf').textContent = lista.filter(function(c){return c.estado==='Confirmada';}).length;
+  document.getElementById('s-canc').textContent = lista.filter(function(c){return c.estado==='Cancelada';}).length;
+}
+
+/* ══ Header PDF ══════════════════════════════════════════════ */
+function actualizarHeaderPDF(lista){
+  var desde  = document.getElementById('f-desde').value;
+  var hasta  = document.getElementById('f-hasta').value;
+  var estado = document.getElementById('f-estado').value;
+  var origen = document.getElementById('f-origen').value;
+  var mes    = document.getElementById('f-mes').value;
+  var partes = [];
+  if(mes){ var p=mes.split('-'); partes.push('Mes: '+MESES[parseInt(p[1])-1]+' '+p[0]); }
+  if(desde && hasta) partes.push('Del '+fmtHuman(desde)+' al '+fmtHuman(hasta));
+  else if(desde) partes.push('Desde: '+fmtHuman(desde));
+  else if(hasta) partes.push('Hasta: '+fmtHuman(hasta));
+  if(estado) partes.push('Estado: '+estado);
+  if(origen) partes.push('Origen: '+origen);
+  partes.push('Total: '+lista.length+' cita'+(lista.length!==1?'s':''));
+  partes.push('Generado: '+new Date().toLocaleString('es-MX'));
+  document.getElementById('ph-txt').textContent = partes.join('  ·  ');
+}
+
+/* ══ Exportar PDF ════════════════════════════════════════════ */
+function exportarPDF(){
+  if(!document.getElementById('wrap').style.display || document.getElementById('wrap').style.display==='none'){
+    toast('Primero haz una búsqueda','warn'); return;
+  }
+  var tbody = document.getElementById('tbody');
+  if(tbody.querySelector('.empty-row')){toast('Sin datos para exportar','warn');return;}
+  window.print();
+}
+
+/* ══ Utils ══════════════════════════════════════════════════ */
+function fmtFechaCorta(s){
+  if(!s) return '—';
+  var dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  try{
+    var d = new Date(s+'T12:00:00');
+    return dias[d.getDay()]+' '+d.getDate()+' '+MESES[d.getMonth()].substring(0,3);
+  } catch(e){ return s; }
+}
+function fmtHuman(s){
+  if(!s) return '';
+  try{ return new Date(s+'T12:00:00').toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'}); }
+  catch(e){ return s; }
+}
+function esc(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function toast(msg,type){
+  var c=document.getElementById('toasts'), t=document.createElement('div');
+  t.className='toast';
+  t.style.borderLeftColor = type==='ok'?'var(--ok)':type==='err'?'var(--err)':'var(--warn)';
+  t.textContent=msg; c.appendChild(t);
+  setTimeout(function(){
+    t.style.opacity='0'; t.style.transform='translateX(30px)'; t.style.transition='.3s';
+    setTimeout(function(){t.remove();},350);
+  },3500);
+}
+/* Polyfill finally */
+if(!Promise.prototype.finally){
+  Promise.prototype.finally=function(fn){return this.then(function(v){fn();return v;},function(e){fn();throw e;});};
+}
+</script>
+</body>
+</html>
