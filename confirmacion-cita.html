@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Confirma tu cita — Bienestar Emocional</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ri:#FF85C0;--mi:#A67FFF;--rp:#FFE5F0;--mp:#E8D5FF;
+  --bg:#faf8ff;--card:#ffffff;--border:#ede8ff;
+  --mid:#6b7280;--text:#1a1625;
+  --ok:#16a34a;--err:#dc2626;--warn:#d97706;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100vh;font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);}
+
+/* ── Background decorativo ── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 0%,rgba(255,133,192,.13) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 40% at 90% 100%,rgba(166,127,255,.12) 0%,transparent 60%);
+  pointer-events:none;
+}
+
+/* ── Layout ── */
+.wrap{
+  position:relative;z-index:1;
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-start;
+  padding:2rem 1rem 4rem;
+}
+
+/* ── Logo / header ── */
+.logo-area{text-align:center;margin-bottom:2rem;}
+.logo-circle{
+  width:62px;height:62px;border-radius:18px;margin:0 auto 1rem;
+  background:linear-gradient(135deg,var(--ri),var(--mi));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.7rem;box-shadow:0 8px 28px rgba(166,127,255,.35);
+}
+.logo-brand{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);}
+.logo-brand span{
+  background:linear-gradient(135deg,var(--ri),var(--mi));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.logo-sub{font-size:.78rem;color:var(--mid);margin-top:.2rem;}
+
+/* ── Card principal ── */
+.card{
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:24px;width:100%;max-width:480px;
+  box-shadow:0 8px 40px rgba(166,127,255,.1),0 2px 8px rgba(0,0,0,.04);
+  overflow:hidden;
+}
+
+/* ── Card header con gradiente ── */
+.card-hero{
+  background:linear-gradient(135deg,rgba(232,213,255,.5),rgba(255,229,240,.4));
+  padding:1.6rem 1.5rem 1.3rem;border-bottom:1px solid var(--border);
+  text-align:center;
+}
+.card-hero-ico{font-size:2.2rem;margin-bottom:.5rem;}
+.card-hero-title{
+  font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;
+  color:var(--text);margin-bottom:.3rem;
+}
+.card-hero-sub{font-size:.82rem;color:var(--mid);line-height:1.55;}
+
+/* ── Card body ── */
+.card-body{padding:1.4rem 1.5rem;}
+
+/* ── Datos de la cita ── */
+.cita-box{
+  background:linear-gradient(135deg,rgba(232,213,255,.25),rgba(255,229,240,.2));
+  border:1.5px solid var(--border);border-radius:14px;
+  padding:1.1rem 1.2rem;margin-bottom:1.3rem;
+}
+.cita-nombre{
+  font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;
+  margin-bottom:.6rem;
+}
+.cita-grid{display:grid;grid-template-columns:auto 1fr;gap:.35rem .7rem;align-items:start;}
+.cita-ico{font-size:.95rem;line-height:1.5;}
+.cita-val{font-size:.85rem;line-height:1.5;color:var(--text);}
+.cita-val strong{font-weight:700;}
+.cita-val.mid{color:var(--mid);}
+
+/* ── Separador ── */
+.sep{display:flex;align-items:center;gap:.5rem;margin:1.1rem 0;}
+.sep span{font-size:.62rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;}
+.sep::before,.sep::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── Botones principales ── */
+.action-btns{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.1rem;}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:.5rem;
+  padding:.85rem 1.2rem;border-radius:50px;font-family:'Manrope',sans-serif;
+  font-size:.92rem;font-weight:700;cursor:pointer;border:none;
+  transition:all .22s;width:100%;
+}
+.btn:active{transform:scale(.97);}
+.btn-confirmar{
+  background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;
+  box-shadow:0 5px 18px rgba(34,197,94,.3);
+}
+.btn-confirmar:hover{box-shadow:0 8px 24px rgba(34,197,94,.4);transform:translateY(-1px);}
+.btn-confirmar:disabled{opacity:.55;cursor:not-allowed;transform:none;}
+.btn-reagendar{
+  background:var(--bg);color:var(--text);
+  border:1.5px solid var(--border);
+}
+.btn-reagendar:hover{border-color:var(--mi);color:var(--mi);}
+
+/* ── Formulario de reagenda ── */
+.reagenda-form{
+  display:none;background:var(--bg);border:1.5px solid var(--border);
+  border-radius:14px;padding:1.1rem 1.2rem;margin-bottom:1rem;
+}
+.reagenda-form.open{display:block;}
+.fg{margin-bottom:.8rem;}
+.fg label{
+  display:block;font-size:.65rem;font-weight:700;color:var(--mid);
+  text-transform:uppercase;letter-spacing:.09em;margin-bottom:.35rem;
+}
+input[type=date],input[type=time],textarea,select{
+  width:100%;padding:.7rem .95rem;border:1.5px solid var(--border);
+  border-radius:10px;font-family:'Manrope',sans-serif;font-size:.9rem;
+  color:var(--text);background:#fff;outline:none;transition:all .2s;
+  -webkit-appearance:none;appearance:none;
+}
+input:focus,textarea:focus,select:focus{
+  border-color:var(--mi);box-shadow:0 0 0 3px rgba(166,127,255,.1);
+}
+textarea{min-height:70px;resize:vertical;line-height:1.6;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
+.btn-enviar-reagenda{
+  background:linear-gradient(135deg,var(--ri),var(--mi));color:#fff;
+  box-shadow:0 4px 16px rgba(166,127,255,.3);
+  display:flex;align-items:center;justify-content:center;gap:.4rem;
+  padding:.8rem;border-radius:50px;font-family:'Manrope',sans-serif;
+  font-size:.9rem;font-weight:700;cursor:pointer;border:none;
+  transition:all .2s;width:100%;
+}
+.btn-enviar-reagenda:disabled{opacity:.5;cursor:not-allowed;}
+
+/* ── Opciones de contacto ── */
+.contacto-row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+.btn-contacto{
+  display:flex;align-items:center;justify-content:center;gap:.35rem;
+  padding:.65rem;border-radius:12px;font-family:'Manrope',sans-serif;
+  font-size:.8rem;font-weight:700;cursor:pointer;border:none;transition:all .2s;
+}
+.btn-wa{background:#25D366;color:#fff;}
+.btn-wa:hover{background:#1da851;}
+.btn-sms{background:#3b82f6;color:#fff;}
+.btn-sms:hover{background:#2563eb;}
+
+/* ── Footer ── */
+.card-footer{
+  padding:.9rem 1.5rem;border-top:1px solid var(--border);
+  text-align:center;font-size:.72rem;color:var(--mid);
+  background:rgba(245,242,255,.4);
+}
+.card-footer a{color:var(--mi);text-decoration:none;font-weight:600;}
+
+/* ── Estados de respuesta ── */
+.estado-ok{
+  display:none;text-align:center;padding:2rem 1.5rem;
+}
+.estado-ok .ico{font-size:3rem;margin-bottom:.8rem;}
+.estado-ok h2{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;margin-bottom:.4rem;}
+.estado-ok p{font-size:.84rem;color:var(--mid);line-height:1.6;}
+
+/* ── Spinner ── */
+.spin{
+  display:inline-block;width:15px;height:15px;
+  border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;
+  border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0;
+}
+@keyframes sp{to{transform:rotate(360deg);}}
+
+/* ── Error state ── */
+.error-state{
+  text-align:center;padding:3rem 1.5rem;
+  display:none;
+}
+.error-state .ico{font-size:2.8rem;margin-bottom:.8rem;opacity:.5;}
+.error-state p{font-size:.85rem;color:var(--mid);}
+
+/* ── Toast ── */
+.toast-wrap{
+  position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
+  z-index:999;display:flex;flex-direction:column;gap:.4rem;
+  align-items:center;pointer-events:none;width:90%;max-width:340px;
+}
+.toast{
+  background:#1a1625;color:#fff;padding:.75rem 1.1rem;border-radius:12px;
+  font-size:.83rem;font-weight:600;border-left:3px solid transparent;
+  box-shadow:0 8px 24px rgba(0,0,0,.3);animation:tin .3s ease;width:100%;
+}
+@keyframes tin{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+
+/* ── Mobile ── */
+@media(max-width:480px){
+  .wrap{padding:1.2rem .75rem 3rem;}
+  .card{border-radius:20px;}
+  .card-hero{padding:1.3rem 1.2rem 1.1rem;}
+  .card-body{padding:1.1rem 1.1rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- Logo -->
+  <div class="logo-area">
+    <div class="logo-circle">💜</div>
+    <div class="logo-brand">Bienestar <span>Emocional</span></div>
+    <div class="logo-sub">Confirmación de cita</div>
+  </div>
+
+  <!-- Card -->
+  <div class="card" id="main-card">
+
+    <!-- Hero -->
+    <div class="card-hero">
+      <div class="card-hero-ico">📅</div>
+      <div class="card-hero-title" id="hero-title">Tienes una cita agendada</div>
+      <div class="card-hero-sub" id="hero-sub">Revisa los detalles y confirma o solicita un cambio de horario.</div>
+    </div>
+
+    <!-- Body -->
+    <div class="card-body" id="card-body">
+
+      <!-- Datos de la cita -->
+      <div class="cita-box">
+        <div class="cita-nombre" id="c-nombre">—</div>
+        <div class="cita-grid">
+          <span class="cita-ico">📋</span><span class="cita-val" id="c-servicio">—</span>
+          <span class="cita-ico">📅</span><span class="cita-val"><strong id="c-fecha">—</strong></span>
+          <span class="cita-ico">🕐</span><span class="cita-val" id="c-hora">—</span>
+          <span class="cita-ico">📱</span><span class="cita-val mid" id="c-tel">—</span>
+          <span class="cita-ico">📧</span><span class="cita-val mid" id="c-correo" style="font-size:.78rem;word-break:break-all;">—</span>
+        </div>
+      </div>
+
+      <!-- Botones principales -->
+      <div class="action-btns">
+        <button class="btn btn-confirmar" id="btn-confirmar" onclick="confirmarCita()">
+          ✅ Confirmar mi cita
+        </button>
+        <button class="btn btn-reagendar" onclick="toggleReagenda()">
+          🔄 Solicitar otro horario
+        </button>
+      </div>
+
+      <!-- Formulario de reagenda -->
+      <div class="reagenda-form" id="reagenda-form">
+        <div class="sep"><span>Propón un nuevo horario</span></div>
+        <div class="g2">
+          <div class="fg">
+            <label>Fecha preferida</label>
+            <input type="date" id="r-fecha">
+          </div>
+          <div class="fg">
+            <label>Hora preferida</label>
+            <input type="time" id="r-hora" value="10:00">
+          </div>
+        </div>
+        <div class="fg">
+          <label>Mensaje o nota <small style="text-transform:none;font-weight:400;">(opcional)</small></label>
+          <textarea id="r-nota" placeholder="Ej: prefiero por las tardes, solo fines de semana..."></textarea>
+        </div>
+        <button class="btn-enviar-reagenda" id="btn-enviar-reagenda" onclick="enviarReagenda()">
+          📨 Enviar solicitud de cambio
+        </button>
+      </div>
+
+      <div class="sep"><span>También puedes contactarnos</span></div>
+
+      <!-- Botones de contacto directo -->
+      <div class="contacto-row">
+        <button class="btn-contacto btn-wa" onclick="abrirWA()">💬 WhatsApp</button>
+        <button class="btn-contacto btn-sms" onclick="abrirSMS()">📱 Llamar / SMS</button>
+      </div>
+
+    </div><!-- /card-body -->
+
+    <!-- Estado OK confirmar -->
+    <div class="estado-ok" id="estado-confirmar-ok">
+      <div class="ico">🎉</div>
+      <h2>¡Cita confirmada!</h2>
+      <p>Tu cita ha sido confirmada. Te esperamos el <strong id="ok-fecha-txt">—</strong>.<br>Si necesitas algo más, contáctanos por WhatsApp.</p>
+      <br>
+      <button class="btn-contacto btn-wa" style="max-width:200px;margin:0 auto;padding:.7rem 1rem;" onclick="abrirWA()">
+        💬 Escribir por WhatsApp
+      </button>
+    </div>
+
+    <!-- Estado OK reagenda -->
+    <div class="estado-ok" id="estado-reagenda-ok">
+      <div class="ico">📬</div>
+      <h2>¡Solicitud enviada!</h2>
+      <p>Recibimos tu solicitud de cambio de horario. Te contactaremos a la brevedad para confirmar el nuevo día y hora. 🌿</p>
+      <br>
+      <button class="btn-contacto btn-wa" style="max-width:200px;margin:0 auto;padding:.7rem 1rem;" onclick="abrirWA()">
+        💬 Seguimiento por WA
+      </button>
+    </div>
+
+    <!-- Error -->
+    <div class="error-state" id="error-state">
+      <div class="ico">⚠️</div>
+      <p>No se encontraron los datos de la cita.<br>Por favor, usa el link que te enviamos o contáctanos directamente.</p>
+    </div>
+
+    <div class="card-footer">
+      Bienestar Emocional &nbsp;·&nbsp;
+      <a href="https://wa.me/524425839311" target="_blank">WhatsApp</a>
+    </div>
+
+  </div><!-- /card -->
+
+</div><!-- /wrap -->
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+'use strict';
+var PROXY    = 'https://script.google.com/macros/s/AKfycbz-_1X-c3aZ2lJ4N6m3R5tP2l2cznIs7Seuvkb5X5J1oPVrIXDwkEHi936b4dXg5JxO/exec';
+var WA_ADMIN = '524425839311';
+
+var MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+var DIAS  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
+/* ══ Leer parámetros de URL ════════════════════════════ */
+var params = new URLSearchParams(window.location.search);
+var DATOS = {
+  nombre:  params.get('nombre')  || '',
+  tel:     params.get('tel')     || '',
+  correo:  params.get('correo')  || '',
+  servicio:params.get('servicio')|| '',
+  fecha:   params.get('fecha')   || '',   /* YYYY-MM-DD */
+  hora:    params.get('hora')    || '',
+  horaFin: params.get('horaFin') || '',
+  hoja:    params.get('hoja')    || '',
+  row:     params.get('row')     || ''
+};
+
+/* ══ Init ═══════════════════════════════════════════════ */
+(function(){
+  if(!DATOS.nombre || !DATOS.fecha){
+    /* sin datos válidos */
+    document.getElementById('card-body').style.display='none';
+    document.getElementById('card-hero').querySelector('.card-hero-ico').textContent='⚠️';
+    document.getElementById('hero-title').textContent='Link inválido';
+    document.getElementById('hero-sub').textContent='Este link no contiene información de cita. Usa el link que te enviamos.';
+    document.getElementById('error-state').style.display='block';
+    return;
+  }
+
+  /* Fecha legible */
+  var fechaLeg = fmtFechaLeg(DATOS.fecha);
+  var horaLeg  = DATOS.hora + (DATOS.horaFin ? ' – '+DATOS.horaFin : '');
+
+  /* Rellenar card */
+  document.getElementById('c-nombre').textContent   = DATOS.nombre  || '—';
+  document.getElementById('c-servicio').textContent = DATOS.servicio || '—';
+  document.getElementById('c-fecha').textContent    = fechaLeg       || DATOS.fecha;
+  document.getElementById('c-hora').textContent     = horaLeg        || '—';
+  document.getElementById('c-tel').textContent      = DATOS.tel      || '—';
+  document.getElementById('c-correo').textContent   = DATOS.correo   || '—';
+
+  /* Nombre en hero */
+  var primer = DATOS.nombre.split(' ')[0];
+  document.getElementById('hero-title').textContent = '¡Hola, '+primer+'! 👋';
+
+  /* Fecha mínima en reagenda = mañana */
+  var man = new Date(); man.setDate(man.getDate()+1);
+  document.getElementById('r-fecha').min = man.toISOString().substring(0,10);
+})();
+
+/* ══ Confirmar cita ═════════════════════════════════════ */
+function confirmarCita(){
+  var btn = document.getElementById('btn-confirmar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Confirmando…';
+
+  /* Llamar al Apps Script */
+  apiPost('marcarFormularioAtendido',{
+    tab:      DATOS.hoja,
+    rowIndex: DATOS.row,
+    estado:   'Confirmado',
+    fechaCita:DATOS.fecha,
+    horaCita: DATOS.hora
+  })
+  .then(function(){
+    /* Mostrar estado OK */
+    document.getElementById('card-body').style.display='none';
+    document.getElementById('ok-fecha-txt').textContent = fmtFechaLeg(DATOS.fecha);
+    document.getElementById('estado-confirmar-ok').style.display='block';
+    /* Notificar admin por WA */
+    var primer = DATOS.nombre.split(' ')[0];
+    var msgAdmin = '✅ *Cita Confirmada por el cliente*\n\n'
+      +'👤 *'+DATOS.nombre+'*\n'
+      +'📱 '+DATOS.tel+'\n'
+      +'🏷️ '+DATOS.servicio+'\n'
+      +'📅 '+fmtFechaLeg(DATOS.fecha)+'\n'
+      +'🕐 '+(DATOS.hora+(DATOS.horaFin?' – '+DATOS.horaFin:''));
+    setTimeout(function(){
+      window.open('https://wa.me/'+WA_ADMIN+'?text='+encodeURIComponent(msgAdmin),'_blank');
+    },600);
+  })
+  .catch(function(e){
+    /* Si falla la API igual mostramos confirmado visualmente */
+    document.getElementById('card-body').style.display='none';
+    document.getElementById('ok-fecha-txt').textContent = fmtFechaLeg(DATOS.fecha);
+    document.getElementById('estado-confirmar-ok').style.display='block';
+    /* Notificar admin de todas formas */
+    var msgAdmin = '✅ *Cita Confirmada por el cliente*\n\n'
+      +'👤 *'+DATOS.nombre+'*\n📱 '+DATOS.tel+'\n🏷️ '+DATOS.servicio
+      +'\n📅 '+fmtFechaLeg(DATOS.fecha)+'\n🕐 '+DATOS.hora;
+    setTimeout(function(){
+      window.open('https://wa.me/'+WA_ADMIN+'?text='+encodeURIComponent(msgAdmin),'_blank');
+    },600);
+  });
+}
+
+/* ══ Toggle reagenda ════════════════════════════════════ */
+function toggleReagenda(){
+  var f = document.getElementById('reagenda-form');
+  var open = f.classList.toggle('open');
+  document.querySelector('.btn-reagendar').textContent = open ? '✕ Cancelar' : '🔄 Solicitar otro horario';
+  if(open) setTimeout(function(){f.scrollIntoView({behavior:'smooth',block:'nearest'});},80);
+}
+
+/* ══ Enviar solicitud de reagenda ═══════════════════════ */
+function enviarReagenda(){
+  var fecha = document.getElementById('r-fecha').value;
+  var hora  = document.getElementById('r-hora').value;
+  var nota  = document.getElementById('r-nota').value.trim();
+  if(!fecha){toast('Selecciona una fecha preferida','warn');return;}
+
+  var btn = document.getElementById('btn-enviar-reagenda');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> Enviando…';
+
+  var primer = DATOS.nombre.split(' ')[0];
+  var fechaLeg = fmtFechaLeg(fecha);
+
+  /* Notificar admin por WA */
+  var msgAdmin = '🔄 *Solicitud de reagenda*\n\n'
+    +'👤 *'+DATOS.nombre+'*\n'
+    +'📱 '+DATOS.tel+'\n'
+    +'🏷️ '+DATOS.servicio+'\n\n'
+    +'📅 *Cita original:* '+fmtFechaLeg(DATOS.fecha)+(DATOS.hora?' '+DATOS.hora:'')+'\n'
+    +'📅 *Nuevo horario solicitado:* '+fechaLeg+(hora?' '+hora:'')+'\n'
+    +(nota?'📝 *Nota:* '+nota:'');
+
+  /* Intentar guardar en hoja */
+  var promesas = [];
+  if(DATOS.hoja && DATOS.row){
+    promesas.push(
+      apiPost('marcarFormularioAtendido',{
+        tab:      DATOS.hoja,
+        rowIndex: DATOS.row,
+        estado:   'Reagenda solicitada',
+        fechaCita:fecha,
+        horaCita: hora
+      }).catch(function(){}) /* silencioso si falla */
+    );
+  }
+  Promise.all(promesas).finally(function(){
+    document.getElementById('card-body').style.display='none';
+    document.getElementById('estado-reagenda-ok').style.display='block';
+    setTimeout(function(){
+      window.open('https://wa.me/'+WA_ADMIN+'?text='+encodeURIComponent(msgAdmin),'_blank');
+    },500);
+  });
+}
+
+/* ══ Contacto directo ═══════════════════════════════════ */
+function abrirWA(){
+  var primer = DATOS.nombre?DATOS.nombre.split(' ')[0]:'';
+  var msg = 'Hola, soy '+DATOS.nombre+' y tengo una consulta sobre mi cita'+(DATOS.fecha?' del '+fmtFechaLeg(DATOS.fecha):'')+'.';
+  window.open('https://wa.me/'+WA_ADMIN+'?text='+encodeURIComponent(msg),'_blank');
+}
+function abrirSMS(){
+  var tel = WA_ADMIN;
+  var msg = 'Hola, soy '+DATOS.nombre+' y tengo una consulta sobre mi cita.';
+  window.open('sms:'+tel+'?body='+encodeURIComponent(msg));
+}
+
+/* ══ API ════════════════════════════════════════════════ */
+function apiPost(action,payload){
+  return fetch(PROXY,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify(Object.assign({action:action},payload))})
+    .then(function(r){return r.text();})
+    .then(function(t){var j=JSON.parse(t);if(!j.ok)throw new Error(j.error||'Error');return j;});
+}
+
+/* ══ Utils ══════════════════════════════════════════════ */
+function fmtFechaLeg(s){
+  if(!s)return'';
+  try{
+    var d = new Date(s+'T12:00:00');
+    return DIAS[d.getDay()]+' '+d.getDate()+' de '+MESES[d.getMonth()]+' '+d.getFullYear();
+  }catch(e){return s;}
+}
+function toast(msg,type){
+  var c=document.getElementById('toast-wrap'),t=document.createElement('div');
+  t.className='toast';
+  t.style.borderLeftColor=type==='ok'?'#22c55e':type==='err'?'#dc2626':'#f59e0b';
+  t.textContent=msg;c.appendChild(t);
+  setTimeout(function(){t.style.opacity='0';t.style.transition='.3s';setTimeout(function(){t.remove();},350);},3500);
+}
+</script>
+</body>
+</html>
