@@ -864,12 +864,17 @@ function doLogout(){if(!confirm('¿Cerrar sesion?'))return;clearTimeout(inactTim
 function resetInact(){clearTimeout(inactTimer);inactTimer=setTimeout(function(){toast('Sesion cerrada por inactividad','warn');doLogout();},INACT_MS);}
 
 function cargarLogoLogin(){
+  var icon=document.getElementById('l-icon-login');
+  if(icon)icon.innerHTML='<span class="spin"></span>';
   apiGet('Config').then(function(d){
     if(d.logo_url){
-      var icon=document.getElementById('l-icon-login');
-      if(icon)icon.innerHTML='<img src="'+d.logo_url+'" style="width:48px;height:48px;object-fit:contain;border-radius:10px;">';
+      if(icon)icon.innerHTML='<img src="'+d.logo_url+'" style="width:48px;height:48px;object-fit:contain;border-radius:10px;" onerror="this.parentNode.innerHTML=\'✏️\'">';
+    }else{
+      if(icon)icon.innerHTML='✏️';
     }
-  }).catch(function(){});
+  }).catch(function(){
+    if(icon)icon.innerHTML='✏️';
+  });
 }
   
   function togglePwd(id,btn){var inp=document.getElementById(id);inp.type=inp.type==='password'?'text':'password';
