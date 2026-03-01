@@ -346,7 +346,9 @@ input[type=color]{cursor:pointer;padding:2px;border-radius:7px;background:transp
   <div class="l-orb l-orb2"></div>
   <div class="l-card">
     <div class="l-head">
-      <div class="l-icon">✏️</div>
+      
+      <div class="l-icon" id="l-icon-login">✏️</div>
+      
       <div class="l-title">Editor de contenido</div>
       <div class="l-sub">Bienestar Emocional · Acceso restringido</div>
     </div>
@@ -860,8 +862,20 @@ function abrirEditor(){document.getElementById('selectorScreen').style.display='
 function applyRoleUI(rol){var uNav=document.getElementById('nav-usuarios');if(uNav)uNav.style.display=(rol==='admin')?'':'none';if(rol==='viewer')document.querySelectorAll('.save-btn').forEach(function(b){b.style.display='none';});}
 function doLogout(){if(!confirm('¿Cerrar sesion?'))return;clearTimeout(inactTimer);currentUser=null;sessionStorage.removeItem('be_sess');document.removeEventListener('mousemove',resetInact);document.removeEventListener('keydown',resetInact);document.getElementById('loginScreen').classList.remove('hidden');document.getElementById('app').classList.remove('on');document.getElementById('selectorScreen').style.display='none';var btn=document.getElementById('lbtn');btn.disabled=false;btn.innerHTML='Entrar al editor';document.getElementById('lerr').classList.remove('show');document.getElementById('lu').value='';document.getElementById('lp').value='';document.getElementById('latt').textContent=MAX_ATT;attempts=MAX_ATT;}
 function resetInact(){clearTimeout(inactTimer);inactTimer=setTimeout(function(){toast('Sesion cerrada por inactividad','warn');doLogout();},INACT_MS);}
-function togglePwd(id,btn){var inp=document.getElementById(id);inp.type=inp.type==='password'?'text':'password';btn.textContent=inp.type==='password'?'ver':'ocultar';}
-(function(){try{var s=JSON.parse(sessionStorage.getItem('be_sess'));if(s&&(Date.now()-s.ts)<INACT_MS){currentUser={login:s.login,nombre:s.nombre,rol:s.rol};launchApp(currentUser);}}catch(e){}})();
+
+function cargarLogoLogin(){
+  apiGet('Config').then(function(d){
+    if(d.logo_url){
+      var icon=document.getElementById('l-icon-login');
+      if(icon)icon.innerHTML='<img src="'+d.logo_url+'" style="width:48px;height:48px;object-fit:contain;border-radius:10px;">';
+    }
+  }).catch(function(){});
+}
+  
+  function togglePwd(id,btn){var inp=document.getElementById(id);inp.type=inp.type==='password'?'text':'password';
+                             btn.textContent=inp.type==='password'?'ver':'ocultar';}
+
+  (function(){try{var s=JSON.parse(sessionStorage.getItem('be_sess'));if(s&&(Date.now()-s.ts)<INACT_MS){currentUser={login:s.login,nombre:s.nombre,rol:s.rol};launchApp(currentUser);}}catch(e){}})();
 
 /* ═══ NAVEGACION ═══ */
 function goTo(name,el){
@@ -1068,6 +1082,7 @@ if(!Promise.prototype.finally){Promise.prototype.finally=function(fn){return thi
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeUserModal();cerrarAgenda();}});
 document.getElementById('userModal').addEventListener('click',function(e){if(e.target===this)closeUserModal();});
 document.getElementById('agendaModal').addEventListener('click',function(e){if(e.target===this)cerrarAgenda();});
+cargarLogoLogin();
 </script>
 </body>
 </html>
