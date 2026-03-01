@@ -1013,16 +1013,47 @@ function renderUsersTable(){var rL={admin:'Administrador',editor:'Editor',viewer
 function openUserModal(){['um-idx','um-nombre','um-login','um-pass'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('um-rol').value='editor';document.getElementById('um-activo').checked=true;document.getElementById('um-pass-opt').textContent='';document.getElementById('um-title').textContent='👤 Nuevo usuario';document.getElementById('um-strength').textContent='';document.getElementById('str-bar').style.width='0';document.getElementById('um-pass').type='password';document.getElementById('userModal').classList.add('show');}
 function editUser(idx){var u=usersData.find(function(u){return u.idx===idx;});if(!u)return;document.getElementById('um-title').textContent='Editar: '+u.nombre;document.getElementById('um-idx').value=idx;document.getElementById('um-nombre').value=u.nombre;document.getElementById('um-login').value=u.login;document.getElementById('um-pass').value='';document.getElementById('um-rol').value=u.rol;document.getElementById('um-activo').checked=u.activo==='true';document.getElementById('um-pass-opt').textContent='dejar vacío para no cambiar';document.getElementById('um-strength').textContent='';document.getElementById('str-bar').style.width='0';document.getElementById('um-pass').type='password';document.getElementById('userModal').classList.add('show');}
 function closeUserModal(){document.getElementById('userModal').classList.remove('show');}
-function saveUser(){var idx=document.getElementById('um-idx').value,nombre=document.getElementById('um-nombre').value.trim(),login=document.getElementById('um-login').value.trim(),pass=document.getElementById('um-pass').value,rol=document.getElementById('um-rol').value,activo=document.getElementById('um-activo').checked?'true':'false';if(!nombre){toast('El nombre es obligatorio.','err');return;}if(!login){toast('El login es obligatorio.','err');return;}if(!/^[\w.]+$/.test(login)){toast('Login invalido: solo letras, numeros y punto.','err');return;}if(!idx&&!pass){toast('La contraseña es obligatoria para nuevos usuarios.','err');return;}if(pass&&pass.length<8){toast('La contraseña debe tener minimo 8 caracteres.','err');return;}var dup=usersData.find(function(u){return u.login===login&&String(u.idx)!==String(idx);});if(dup){toast('Ya existe un usuario con ese login.','err');return;}var userIdx=idx?parseInt(idx):(usersData.length>0?Math.max.apply(null,usersData.map(function(u){return u.idx;}))+1:1);var sd={};sd['login_'+userIdx]=login;sd['nombre_'+userIdx]=nombre;
-                    sd['rol_'+userIdx]=rol;
-                    sd['activo_'+userIdx]=activo;
-                    if(pass)sd['pass_'+userIdx]=pass;
-                    if(!pass){
-  var userExistente=usersData.find(function(u){return u.idx===userIdx;});
-  if(userExistente&&userExistente.pass)sd['pass_'+userIdx]=userExistente.pass;
+function saveUser(){
+  var idx=document.getElementById('um-idx').value,
+      nombre=document.getElementById('um-nombre').value.trim(),
+      login=document.getElementById('um-login').value.trim(),
+      pass=document.getElementById('um-pass').value,
+      rol=document.getElementById('um-rol').value,
+      activo=document.getElementById('um-activo').checked?'true':'false';
+
+  if(!nombre){toast('El nombre es obligatorio.','err');return;}
+  if(!login){toast('El login es obligatorio.','err');return;}
+  if(!/^[\w.]+$/.test(login)){toast('Login invalido: solo letras, numeros y punto.','err');return;}
+  if(!idx&&!pass){toast('La contraseña es obligatoria para nuevos usuarios.','err');return;}
+  if(pass&&pass.length<8){toast('La contraseña debe tener minimo 8 caracteres.','err');return;}
+
+  var userIdx=idx?parseInt(idx):(usersData.length>0?Math.max.apply(null,usersData.map(function(u){return u.idx;}))+1:1);
+
+  var dup=usersData.find(function(u){return u.login===login&&u.idx!==userIdx;});
+  if(dup){toast('Ya existe un usuario con ese login.','err');return;}
+
+  var sd={};
+  sd['login_'+userIdx]=login;
+  sd['nombre_'+userIdx]=nombre;
+  sd['rol_'+userIdx]=rol;
+  sd['activo_'+userIdx]=activo;
+
+  if(pass){
+    sd['pass_'+userIdx]=pass;
+  }else{
+    var userExistente=usersData.find(function(u){return u.idx===userIdx;});
+    if(userExistente&&userExistente.pass)sd['pass_'+userIdx]=userExistente.pass;
+  }
+
+  apiPost('Usuarios',sd).then(function(){
+    closeUserModal();
+    toast('Usuario guardado.','ok');
+    loadUsersPage();
+  }).catch(function(e){toast('Error: '+e.message,'err');});
 }
-                    
-                    apiPost('Usuarios',sd).then(function(){closeUserModal();toast('Usuario guardado.','ok');loadUsersPage();}).catch(function(e){toast('Error: '+e.message,'err');});}
+
+
+  
 function toggleUserActive(idx,currently){var u=usersData.find(function(u){return u.idx===idx;});if(!u)return;if(!confirm((currently?'Desactivar':'Activar')+' al usuario "'+u.nombre+'"?'))return;var d={};d['activo_'+idx]=currently?'false':'true';apiPost('Usuarios',d).then(function(){toast('Usuario '+(currently?'desactivado':'activado')+'.','warn');loadUsersPage();}).catch(function(e){toast('Error: '+e.message,'err');});}
 function checkPassStrength(){var pass=document.getElementById('um-pass').value,hint=document.getElementById('um-strength'),bar=document.getElementById('str-bar');if(!pass){hint.textContent='';bar.style.width='0';return;}var score=0;if(pass.length>=8)score++;if(pass.length>=12)score++;if(/[A-Z]/.test(pass))score++;if(/[0-9]/.test(pass))score++;if(/[^a-zA-Z0-9]/.test(pass))score++;var labels=['','Muy débil','Débil','Regular','Fuerte','Muy fuerte'],colors=['','#ef4444','#f97316','#eab308','#22c55e','#16a34a'];hint.textContent='Seguridad: '+(labels[score]||'');hint.style.color=bar.style.background=colors[score]||'';bar.style.width=(score*20)+'%';}
 
