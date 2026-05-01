@@ -572,36 +572,13 @@ input[type=color]{cursor:pointer;padding:2px;border-radius:7px;background:transp
         </div>
 
         <!-- Street View -->
-        <div id="map-sv-panel" style="display:none;border-radius:11px;overflow:hidden;border:1.5px solid var(--border);margin-bottom:.65rem;">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem .85rem;background:var(--surface);border-bottom:1px solid var(--border);">
-            <span style="font-size:.78rem;font-weight:600;">👁️ Street View</span>
-            <button type="button" onclick="mapCerrarSV()" style="background:none;border:none;color:var(--text2);font-size:1rem;cursor:pointer;">✕</button>
-          </div>
-          <iframe id="map-sv-iframe" width="100%" height="220" frameborder="0" style="display:block;" allowfullscreen src=""></iframe>
-          <div style="padding:.4rem .85rem;background:var(--warn-bg);border-top:1px solid var(--warn-border);font-size:.7rem;color:var(--warn);">⚠️ Street View requiere cobertura de Google en esa zona.</div>
-        </div>
-
-        <!-- Resultado geocodificación -->
-        <div id="map-loc-result" style="display:none;color:var(--ok);" class="hint"></div>
-
-        <!-- Coordenadas manuales -->
-        <div class="div"><span>Coordenadas</span></div>
-        <div class="g2">
-          <div class="fg"><label>Latitud</label><input type="text" id="map-latitud" placeholder="20.581839" oninput="mapActualizarDesdeCoords()"></div>
-          <div class="fg"><label>Longitud</label><input type="text" id="map-longitud" placeholder="-100.417727" oninput="mapActualizarDesdeCoords()"></div>
-        </div>
-
-        <!-- Opciones adicionales -->
-        <div class="div"><span>Configuración</span></div>
-        <div class="fg"><label>Texto del botón "Cómo llegar"</label><input type="text" id="map-boton_texto" placeholder="Como llegar aqui"></div>
-        <div class="fg">
-          <label>src del iframe (avanzado — se genera automáticamente)</label>
-          <textarea id="map-embed_url" style="min-height:52px;font-size:.76rem;" oninput="mapPreviewEmbed()"></textarea>
-        </div>
-        <input type="hidden" id="map-link_directo">
-
-      </div>
-    </div>
+      <!-- Mapa Leaflet -->
+<div style="position:relative;margin-bottom:.65rem;">
+  <div id="loc-map-be" style="height:280px;border-radius:11px;border:1.5px solid var(--border);overflow:hidden;display:none;"></div>
+  <div id="map-placeholder" style="height:280px;border-radius:11px;border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--surface);flex-direction:column;gap:.5rem;" onclick="iniciarMapa()">
+    <span style="font-size:2rem;">📍</span>
+    <span style="font-size:.85rem;color:var(--text2);font-weight:600;">Haz clic aquí para ubicar tu consultorio</span>
+    <span style="font-size:.7rem;color:var(--text3);">o presiona "Mi ubicación" para usar GPS</span>
   </div>
 </div>
       <!-- ══ MODAL SERVICIOS ══ -->
@@ -979,8 +956,18 @@ function mapMostrarResult(txt){var el=document.getElementById('map-loc-result');
 function mapAbrirStreetView(){var lat=gv('map-latitud'),lng=gv('map-longitud');if(!lat||!lng){toast('Primero ubica un punto en el mapa','warn');return;}document.getElementById('map-sv-panel').style.display='block';mapActualizarSV(parseFloat(lat),parseFloat(lng));document.getElementById('mbtn-sv').className='btn btn-sm btn-primary';}
 function mapCerrarSV(){document.getElementById('map-sv-panel').style.display='none';document.getElementById('map-sv-iframe').src='';document.getElementById('mbtn-sv').className='btn btn-sm btn-ghost';}
 function mapActualizarSV(lat,lng){var panel=document.getElementById('map-sv-panel');if(panel.style.display==='none')return;document.getElementById('map-sv-iframe').src='https://www.google.com/maps/embed/v1/streetview?key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY&location='+lat+','+lng+'&heading=0&pitch=0&fov=90';}
-function mapUsarGPS(){if(!navigator.geolocation){toast('Tu navegador no soporta geolocalización','err');return;}navigator.geolocation.getCurrentPosition(function(pos){var lat=pos.coords.latitude,lng=pos.coords.longitude;if(_beMap&&_beMarker){_beMap.setView([lat,lng],16);_beMarker.setLatLng([lat,lng]);}else initBeMap(lat,lng);mapGuardarCoords(lat,lng);mapReverseGeocode(lat,lng);},function(){toast('No se pudo obtener tu posición','err');},{enableHighAccuracy:true,timeout:8000});}
-
+function mapUsarGPS(){
+  if(!navigator.geolocation){toast('Tu navegador no soporta geolocalización','err');return;}
+  document.getElementById('map-placeholder').style.display='none';
+  document.getElementById('loc-map-be').style.display='block';
+  document.getElementById('map-layer-btns').style.display='flex';
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var lat=pos.coords.latitude,lng=pos.coords.longitude;
+    initBeMap(lat,lng);
+    mapGuardarCoords(lat,lng);
+    mapReverseGeocode(lat,lng);
+  },function(){toast('No se pudo obtener tu posición','err');},{enableHighAccuracy:true,timeout:8000});
+}
 // aqui va funcion
   function fillMapa(d){
   sv('map-latitud',d.latitud||'20.588100');
@@ -1066,6 +1053,14 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeUserMo
 document.getElementById('userModal').addEventListener('click',function(e){if(e.target===this)closeUserModal();});
 document.getElementById('agendaModal').addEventListener('click',function(e){if(e.target===this)cerrarAgenda();});
 cargarLogoLogin();
+  function iniciarMapa(){
+  document.getElementById('map-placeholder').style.display='none';
+  document.getElementById('loc-map-be').style.display='block';
+  document.getElementById('map-layer-btns').style.display='flex';
+  var lat=parseFloat(gv('map-latitud'))||20.5881;
+  var lng=parseFloat(gv('map-longitud'))||-100.3889;
+  initBeMap(lat,lng);
+}
 </script>
   // termina ayuda deepseek
 
