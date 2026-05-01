@@ -969,22 +969,14 @@ function mapUsarGPS(){
   },function(){toast('No se pudo obtener tu posición','err');},{enableHighAccuracy:true,timeout:8000});
 }
 // aqui va funcion
-  function fillMapa(d){
+function fillMapa(d){
   sv('map-latitud',d.latitud||'20.588100');
   sv('map-longitud',d.longitud||'-100.388900');
   sv('map-embed_url',d.embed_url||'');
   sv('map-boton_texto',d.boton_texto);
   sv('map-link_directo',d.link_directo||'');
-  var lat=parseFloat(d.latitud)||20.5881;
-  var lng=parseFloat(d.longitud)||-100.3889;
-  function intentar(n){
-    if(typeof L!=='undefined'){
-      initBeMap(lat, lng);
-    } else if(n<30){
-      setTimeout(function(){intentar(n+1);},150);
-    }
-  }
-  intentar(0);
+  // NO llamar a initBeMap aquí
+  // El mapa solo se muestra cuando el usuario busca o usa GPS
 }
 function collectMapa(){return{latitud:gv('map-latitud'),longitud:gv('map-longitud'),embed_url:gv('map-embed_url'),boton_texto:gv('map-boton_texto'),link_directo:gv('map-link_directo')};}
 
