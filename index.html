@@ -865,37 +865,24 @@ input[type=color]{cursor:pointer;padding:2px;border-radius:7px;background:transp
 <button class="agenda-float" onclick="window.open('agenda.html','_blank')">📅 Agenda</button>
 
 <script>
+//ayuda deepseek
 
+'use strict';
 
-  'use strict';
-
-// ═══ LEAFLET LOADER ═══
+// ═══ LEAFLET LOADER (ÚNICO) ═══
 (function(){
   if(typeof L !== 'undefined') return;
-  var s=document.createElement('script');
-  s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-  s.onload=function(){
-    var lat=parseFloat(document.getElementById('map-latitud')?document.getElementById('map-latitud').value:'');
-    var lng=parseFloat(document.getElementById('map-longitud')?document.getElementById('map-longitud').value:'');
-    if(!isNaN(lat)&&!isNaN(lng)) initBeMap(lat,lng);
+  var s = document.createElement('script');
+  s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  s.onload = function(){
+    console.log('✅ Leaflet listo');
+    var lat = parseFloat(gv('map-latitud'));
+    var lng = parseFloat(gv('map-longitud'));
+    if(!isNaN(lat) && !isNaN(lng)) initBeMap(lat, lng);
   };
   document.head.appendChild(s);
 })();
 
-// ═══ LEAFLET LOADER ═══
-(function(){
-  if(typeof L !== 'undefined') return; // ya cargado
-  var script=document.createElement('script');
-  script.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-  script.onload=function(){
-    console.log('✅ Leaflet listo');
-    var lat=parseFloat(gv('map-latitud'));
-    var lng=parseFloat(gv('map-longitud'));
-    if(!isNaN(lat)&&!isNaN(lng)) initBeMap(lat,lng);
-  };
-  script.onerror=function(){console.error('❌ No se pudo cargar Leaflet');};
-  document.head.appendChild(script);
-})();
 /* ═══════════════════════════════════════════════
    CONFIGURACION
 ═══════════════════════════════════════════════ */
@@ -906,11 +893,8 @@ var MODAL_TABS=['Empresas','Escuelas','Infantil','Adultos','Evaluaciones'];
 var MODAL_EMOJI={Empresas:'🏢',Escuelas:'🏫',Infantil:'👶',Adultos:'👱',Evaluaciones:'🧠'};
 var attempts=MAX_ATT,currentUser=null,inactTimer=null,currentTab='config',usersData=[],saving=false;
 var COLORES_DEFAULT={morado_intenso:'#A67FFF',rosa_intenso:'#FF85C0',morado_claro:'#E8D5FF',rosa_claro:'#FFE5F0',texto_oscuro:'#2D2A3D'};
-
-// Visibilidad — todas las secciones incluyendo nuevas
 var VIS_SECCIONES=['show_header','show_hero','show_quienes','show_servicios','show_srv_empresas','show_srv_escuelas','show_srv_infantil','show_srv_adultos','show_srv_evaluaciones','show_disponibilidad','show_mapa','show_contacto','show_redes','show_whatsapp_cta','show_footer','show_formularios'];
 var VIS_LABELS={show_header:'Header',show_hero:'Hero',show_quienes:'Quiénes somos',show_servicios:'Servicios',show_srv_empresas:'Empresas',show_srv_escuelas:'Escuelas',show_srv_infantil:'Infantil',show_srv_adultos:'Adultos',show_srv_evaluaciones:'Evaluaciones',show_disponibilidad:'Disponibilidad',show_mapa:'Mapa',show_contacto:'Contacto',show_redes:'Redes',show_whatsapp_cta:'WhatsApp CTA',show_footer:'Footer',show_formularios:'Formularios'};
-
 var DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 var MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 var pendientesData=[],filtroActivo='todos',pendienteActivo=null,slotActivo=null,slotsCache=null;
@@ -949,45 +933,13 @@ function abrirEditor(){document.getElementById('selectorScreen').style.display='
 function applyRoleUI(rol){var uNav=document.getElementById('nav-usuarios');if(uNav)uNav.style.display=(rol==='admin')?'':'none';if(rol==='viewer')document.querySelectorAll('.save-btn').forEach(function(b){b.style.display='none';});}
 function doLogout(){if(!confirm('¿Cerrar sesion?'))return;clearTimeout(inactTimer);currentUser=null;sessionStorage.removeItem('be_sess');document.removeEventListener('mousemove',resetInact);document.removeEventListener('keydown',resetInact);document.getElementById('loginScreen').classList.remove('hidden');document.getElementById('app').classList.remove('on');document.getElementById('selectorScreen').style.display='none';var btn=document.getElementById('lbtn');btn.disabled=false;btn.innerHTML='Entrar al editor';document.getElementById('lerr').classList.remove('show');document.getElementById('lu').value='';document.getElementById('lp').value='';document.getElementById('latt').textContent=MAX_ATT;attempts=MAX_ATT;}
 function resetInact(){clearTimeout(inactTimer);inactTimer=setTimeout(function(){toast('Sesion cerrada por inactividad','warn');doLogout();},INACT_MS);}
-
-function cargarLogoLogin(){
-  var icon=document.getElementById('l-icon-login');
-  if(icon)icon.innerHTML='<span class="spin"></span>';
-  apiGet('Config').then(function(d){
-    if(d.logo_url){
-      if(icon)icon.innerHTML='<img src="'+d.logo_url+'" style="width:48px;height:48px;object-fit:contain;border-radius:10px;" onerror="this.parentNode.innerHTML=\'✏️\'">';
-    }else{
-      if(icon)icon.innerHTML='✏️';
-    }
-  }).catch(function(){
-    if(icon)icon.innerHTML='✏️';
-  });
-}
-  
-  function togglePwd(id,btn){var inp=document.getElementById(id);inp.type=inp.type==='password'?'text':'password';
-                             btn.textContent=inp.type==='password'?'ver':'ocultar';}
-
-  (function(){try{var s=JSON.parse(sessionStorage.getItem('be_sess'));if(s&&(Date.now()-s.ts)<INACT_MS){currentUser={login:s.login,nombre:s.nombre,rol:s.rol};launchApp(currentUser);}}catch(e){}})();
+function cargarLogoLogin(){var icon=document.getElementById('l-icon-login');if(icon)icon.innerHTML='<span class="spin"></span>';apiGet('Config').then(function(d){if(d.logo_url){if(icon)icon.innerHTML='<img src="'+d.logo_url+'" style="width:48px;height:48px;object-fit:contain;border-radius:10px;" onerror="this.parentNode.innerHTML=\'✏️\'">';}else{if(icon)icon.innerHTML='✏️';}}).catch(function(){if(icon)icon.innerHTML='✏️';});}
+function togglePwd(id,btn){var inp=document.getElementById(id);inp.type=inp.type==='password'?'text':'password';btn.textContent=inp.type==='password'?'👁':'🙈';}
+(function(){try{var s=JSON.parse(sessionStorage.getItem('be_sess'));if(s&&(Date.now()-s.ts)<INACT_MS){currentUser={login:s.login,nombre:s.nombre,rol:s.rol};launchApp(currentUser);}}catch(e){}})();
 
 /* ═══ NAVEGACION ═══ */
-function goTo(name,el){
-  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
-  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('on');});
-  if(el)el.classList.add('on');
-  if(MODAL_TABS.indexOf(name)!==-1){currentTab=name;document.getElementById('page-modal').classList.add('on');document.getElementById('modal-card-title').textContent=(MODAL_EMOJI[name]||'')+' '+name;loadCurrentModal();}
-  else if(name==='colores'){document.getElementById('page-colores').classList.add('on');loadColoresPage();}
-  else if(name==='visibilidad'){document.getElementById('page-visibilidad').classList.add('on');loadVisibilidadPage();}
-  else if(name==='pendientes'){document.getElementById('page-pendientes').classList.add('on');loadPendientes();}
-  else{document.getElementById('page-'+name).classList.add('on');loadPage(name);}
-}
-function loadPage(name){
-  if(name==='config')  loadTab('Config',  fillConfig,  'cfg');
-  if(name==='contacto')loadTab('Contacto',fillContacto,'ctc');
-  if(name==='mapa')    loadTab('Mapa',    fillMapa,    'map');
-  if(name==='usuarios')loadUsersPage();
-}
-
-/* ═══ LOADERS ═══ */
+function goTo(name,el){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('on');});if(el)el.classList.add('on');if(MODAL_TABS.indexOf(name)!==-1){currentTab=name;document.getElementById('page-modal').classList.add('on');document.getElementById('modal-card-title').textContent=(MODAL_EMOJI[name]||'')+' '+name;loadCurrentModal();}else if(name==='colores'){document.getElementById('page-colores').classList.add('on');loadColoresPage();}else if(name==='visibilidad'){document.getElementById('page-visibilidad').classList.add('on');loadVisibilidadPage();}else if(name==='pendientes'){document.getElementById('page-pendientes').classList.add('on');loadPendientes();}else{document.getElementById('page-'+name).classList.add('on');loadPage(name);}}
+function loadPage(name){if(name==='config')loadTab('Config',fillConfig,'cfg');if(name==='contacto')loadTab('Contacto',fillContacto,'ctc');if(name==='mapa')loadTab('Mapa',fillMapa,'map');if(name==='usuarios')loadUsersPage();}
 function loadTab(tab,fillFn,prefix){var sk=document.getElementById(prefix+'-loading'),fm=document.getElementById(prefix+'-form');if(sk)sk.style.display='block';if(fm)fm.style.display='none';apiGet(tab).then(function(data){fillFn(data);if(sk)sk.style.display='none';if(fm)fm.style.display='block';}).catch(function(e){toast('Error al cargar '+tab+': '+e.message,'err');if(sk)sk.style.display='none';if(fm)fm.style.display='block';});}
 function saveTab(tab){if(saving)return;if(currentUser&&currentUser.rol==='viewer'){toast('Los visores no pueden guardar.','warn');return;}var data=collectTab(tab);if(!data)return;saving=true;apiPost(tab,data).then(function(){toast(tab+' guardado','ok');}).catch(function(e){toast('Error: '+e.message,'err');}).finally(function(){saving=false;});}
 function collectTab(tab){if(tab==='Config')return collectConfig();if(tab==='Contacto')return collectContacto();if(tab==='Mapa')return collectMapa();return null;}
@@ -995,30 +947,10 @@ function fillConfig(d){sv('cfg-titulo',d.titulo);sv('cfg-subtitulo1',d.subtitulo
 function collectConfig(){return{titulo:gv('cfg-titulo'),subtitulo1:gv('cfg-subtitulo1'),subtitulo2:gv('cfg-subtitulo2'),logo_url:gv('cfg-logo_url'),hero_titulo:gv('cfg-hero_titulo'),hero_descripcion:gv('cfg-hero_descripcion'),quienes_titulo:gv('cfg-quienes_titulo'),quienes_texto:gv('cfg-quienes_texto'),quienes_imagen:gv('cfg-quienes_imagen'),footer_texto:gv('cfg-footer_texto')};}
 function fillContacto(d){sv('ctc-telefono',d.telefono);sv('ctc-correo',d.correo);sv('ctc-horario',d.horario);sv('ctc-facebook',d.facebook);sv('ctc-instagram',d.instagram);sv('ctc-whatsapp_mensaje',d.whatsapp_mensaje);}
 function collectContacto(){return{telefono:gv('ctc-telefono'),correo:gv('ctc-correo'),horario:gv('ctc-horario'),facebook:gv('ctc-facebook'),instagram:gv('ctc-instagram'),whatsapp_mensaje:gv('ctc-whatsapp_mensaje')};}
-function fillMapa(d){
-  sv('map-latitud',d.latitud);
-  sv('map-longitud',d.longitud);
-  sv('map-embed_url',d.embed_url||'');
-  sv('map-boton_texto',d.boton_texto);
-  sv('map-link_directo',d.link_directo||'');
-  var lat=parseFloat(d.latitud),lng=parseFloat(d.longitud);
-  function intentar(n){
-    if(typeof L!=='undefined'){
-      initBeMap(!isNaN(lat)?lat:20.5881, !isNaN(lng)?lng:-100.3889);
-    } else if(n<30){
-      setTimeout(function(){intentar(n+1);},150);
-    }
-  }
-  intentar(0);
-}
-function collectMapa(){return{latitud:gv('map-latitud'),longitud:gv('map-longitud'),embed_url:gv('map-embed_url'),boton_texto:gv('map-boton_texto'),link_directo:gv('map-link_directo')};}
-/* ═══ MAPA INTERACTIVO (Leaflet) ═══ */
+
+/* ═══ MAPA INTERACTIVO (Leaflet) - FIX COMPLETO ═══ */
 var _beMap=null,_beMarker=null,_beLayerObj=null,_beCurrentLayer='osm';
-var _beLayers={
-  osm:      function(){return L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19});},
-  satellite:function(){return L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19});},
-  topo:     function(){return L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{attribution:'© OpenTopoMap',maxZoom:17});}
-};
+var _beLayers={osm:function(){return L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19});},satellite:function(){return L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19});},topo:function(){return L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{attribution:'© OpenTopoMap',maxZoom:17});}};
 function _beIcon(){return L.divIcon({html:'<div style="width:26px;height:26px;background:var(--mi);border:3px solid #fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(0,0,0,.3)"></div>',iconSize:[26,26],iconAnchor:[13,26],className:''});}
 
 function initBeMap(lat,lng){
@@ -1026,153 +958,42 @@ function initBeMap(lat,lng){
   if(_beMap){_beMap.remove();_beMap=null;_beLayerObj=null;}
   el.style.display='block';
   document.getElementById('map-layer-btns').style.display='flex';
-  var iLat=lat||20.5881, iLng=lng||(-100.3889), zoom=lat?16:13;
-  _beMap=L.map('loc-map-be').setView([iLat,iLng],zoom);
+  _beMap=L.map('loc-map-be').setView([lat||20.5881,lng||-100.3889],lat?16:13);
   _beLayerObj=_beLayers[_beCurrentLayer]().addTo(_beMap);
-  setTimeout(function(){_beMap.invalidateSize();},200);
-  _beMarker=L.marker([iLat,iLng],{draggable:true,icon:_beIcon()}).addTo(_beMap);
-  _beMarker.on('dragend',function(){
-    var p=_beMarker.getLatLng();
-    mapGuardarCoords(p.lat,p.lng);
-    mapReverseGeocode(p.lat,p.lng);
-    mapActualizarSV(p.lat,p.lng);
-  });
-  _beMap.on('click',function(e){
-    _beMarker.setLatLng(e.latlng);  // ← FIX: e.latlng con mayúscula
-    mapGuardarCoords(e.latlng.lat,e.latlng.lng);  // ← FIX
-    mapReverseGeocode(e.latlng.lat,e.latlng.lng);  // ← FIX
-    mapActualizarSV(e.latlng.lat,e.latlng.lng);  // ← FIX
-  });
-  if(lat) mapGuardarCoords(lat,lng);
+  setTimeout(function(){_beMap.invalidateSize();},300);
+  _beMarker=L.marker([lat||20.5881,lng||-100.3889],{draggable:true,icon:_beIcon()}).addTo(_beMap);
+  _beMarker.on('dragend',function(){var p=_beMarker.getLatLng();mapGuardarCoords(p.lat,p.lng);mapReverseGeocode(p.lat,p.lng);mapActualizarSV(p.lat,p.lng);});
+  _beMap.on('click',function(e){_beMarker.setLatLng(e.latlng);mapGuardarCoords(e.latlng.lat,e.latlng.lng);mapReverseGeocode(e.latlng.lat,e.latlng.lng);mapActualizarSV(e.latlng.lat,e.latlng.lng);});
+  if(lat)mapGuardarCoords(lat,lng);
 }
-function mapSetLayer(type){
-  _beCurrentLayer=type;
-  [['osm','mbtn-osm'],['satellite','mbtn-sat'],['topo','mbtn-topo']].forEach(function(pair){
-    var btn=document.getElementById(pair[1]);
-    if(!btn)return;
-    var on=pair[0]===type;
-    btn.className='btn btn-sm '+(on?'btn-primary':'btn-ghost');
-  });
-  if(_beMap){
-    if(_beLayerObj)_beMap.removeLayer(_beLayerObj);
-    _beLayerObj=_beLayers[type]().addTo(_beMap);
-  }
-}
-
-function mapGuardarCoords(lat,lng){
-  sv('map-latitud',lat.toFixed(6));
-  sv('map-longitud',lng.toFixed(6));
-  // Regenerar embed URL
-  var src='https://maps.google.com/maps?q='+lat.toFixed(6)+','+lng.toFixed(6)+'&z=17&output=embed';
-  sv('map-embed_url',src);
-  sv('map-link_directo','https://www.google.com/maps?q='+lat.toFixed(6)+','+lng.toFixed(6));
-}
-function mapActualizarDesdeCoords(){
-  var lat=parseFloat(gv('map-latitud')),lng=parseFloat(gv('map-longitud'));
-  if(isNaN(lat)||isNaN(lng))return;
-  if(_beMap&&_beMarker){
-    _beMarker.setLatLng([lat,lng]);  // ← FIX: L.latLng con mayúsculas
-    _beMap.setView([lat,lng],16);
-  }
-  else initBeMap(lat,lng);
-  mapGuardarCoords(lat,lng);
-}
-function mapPreviewEmbed(){
-  var src=gv('map-embed_url');
-  if(!src)return;
-  // Solo actualiza el embed_url; el mapa ya está en Leaflet
-}
-
+function mapSetLayer(type){_beCurrentLayer=type;[['osm','mbtn-osm'],['satellite','mbtn-sat'],['topo','mbtn-topo']].forEach(function(pair){var btn=document.getElementById(pair[1]);if(!btn)return;btn.className='btn btn-sm '+(pair[0]===type?'btn-primary':'btn-ghost');});if(_beMap){if(_beLayerObj)_beMap.removeLayer(_beLayerObj);_beLayerObj=_beLayers[type]().addTo(_beMap);}}
+function mapGuardarCoords(lat,lng){sv('map-latitud',lat.toFixed(6));sv('map-longitud',lng.toFixed(6));sv('map-embed_url','https://maps.google.com/maps?q='+lat.toFixed(6)+','+lng.toFixed(6)+'&z=17&output=embed');sv('map-link_directo','https://www.google.com/maps?q='+lat.toFixed(6)+','+lng.toFixed(6));}
+function mapActualizarDesdeCoords(){var lat=parseFloat(gv('map-latitud')),lng=parseFloat(gv('map-longitud'));if(isNaN(lat)||isNaN(lng))return;if(_beMap&&_beMarker){_beMarker.setLatLng([lat,lng]);_beMap.setView([lat,lng],16);}else initBeMap(lat,lng);mapGuardarCoords(lat,lng);}
+function mapPreviewEmbed(){}
 function buildEmbedFromCoords(){mapActualizarDesdeCoords();}
 function previewMapEmbed(){mapPreviewEmbed();}
+async function mapBuscarDireccion(){var q=gv('map-buscar')||gv('map-latitud');if(!q)return;if(q.includes('google.com/maps')||q.includes('maps.app')){var am=q.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);if(am){initBeMap(parseFloat(am[1]),parseFloat(am[2]));mapGuardarCoords(parseFloat(am[1]),parseFloat(am[2]));mapReverseGeocode(parseFloat(am[1]),parseFloat(am[2]));return;}var pm=q.match(/place\/([^/@]+)/);if(pm)q=decodeURIComponent(pm[1].replace(/\+/g,' '));}mapMostrarResult('🔍 Buscando...');try{var d=await(await fetch('https://nominatim.openstreetmap.org/search?format=json&q='+encodeURIComponent(q)+'&limit=1&addressdetails=1',{headers:{'Accept-Language':'es'}})).json();if(!d.length){mapMostrarResult('❌ No encontrado.');return;}var item=d[0],lat=parseFloat(item.lat),lng=parseFloat(item.lon);initBeMap(lat,lng);mapGuardarCoords(lat,lng);mapMostrarResult('✅ '+lat.toFixed(5)+', '+lng.toFixed(5));}catch(e){mapMostrarResult('❌ Error al buscar');}}
+function mapDetectarPegado(){var val=gv('map-buscar');var cm=val.match(/(-?\d{1,3}\.\d{4,})[,\s]+(-?\d{1,3}\.\d{4,})/);if(cm){initBeMap(parseFloat(cm[1]),parseFloat(cm[2]));mapGuardarCoords(parseFloat(cm[1]),parseFloat(cm[2]));mapReverseGeocode(parseFloat(cm[1]),parseFloat(cm[2]));return;}var am=val.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);if(am){initBeMap(parseFloat(am[1]),parseFloat(am[2]));mapGuardarCoords(parseFloat(am[1]),parseFloat(am[2]));mapReverseGeocode(parseFloat(am[1]),parseFloat(am[2]));return;}if(val.length>15)mapBuscarDireccion();}
+async function mapReverseGeocode(lat,lng){try{var d=await(await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=16&addressdetails=1',{headers:{'Accept-Language':'es'}})).json();var addr=d.address||{};var nombre=[addr.road||addr.pedestrian,addr.city||addr.town||addr.village,addr.state].filter(Boolean).join(', ');if(nombre)sv('map-buscar',nombre);mapMostrarResult('📍 '+lat.toFixed(5)+', '+lng.toFixed(5));}catch(e){}}
+function mapMostrarResult(txt){var el=document.getElementById('map-loc-result');el.textContent=txt;el.style.display='block';el.style.color=txt.startsWith('✅')||txt.startsWith('📍')?'var(--ok)':'var(--err)';}
+function mapAbrirStreetView(){var lat=gv('map-latitud'),lng=gv('map-longitud');if(!lat||!lng){toast('Primero ubica un punto en el mapa','warn');return;}document.getElementById('map-sv-panel').style.display='block';mapActualizarSV(parseFloat(lat),parseFloat(lng));document.getElementById('mbtn-sv').className='btn btn-sm btn-primary';}
+function mapCerrarSV(){document.getElementById('map-sv-panel').style.display='none';document.getElementById('map-sv-iframe').src='';document.getElementById('mbtn-sv').className='btn btn-sm btn-ghost';}
+function mapActualizarSV(lat,lng){var panel=document.getElementById('map-sv-panel');if(panel.style.display==='none')return;document.getElementById('map-sv-iframe').src='https://www.google.com/maps/embed/v1/streetview?key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY&location='+lat+','+lng+'&heading=0&pitch=0&fov=90';}
+function mapUsarGPS(){if(!navigator.geolocation){toast('Tu navegador no soporta geolocalización','err');return;}navigator.geolocation.getCurrentPosition(function(pos){var lat=pos.coords.latitude,lng=pos.coords.longitude;if(_beMap&&_beMarker){_beMap.setView([lat,lng],16);_beMarker.setLatLng([lat,lng]);}else initBeMap(lat,lng);mapGuardarCoords(lat,lng);mapReverseGeocode(lat,lng);},function(){toast('No se pudo obtener tu posición','err');},{enableHighAccuracy:true,timeout:8000});}
 
-async function mapBuscarDireccion(){
-  var q=gv('map-buscar')||gv('map-latitud');
-  if(!q)return;
-  // Detectar link Google Maps
-  if(q.includes('google.com/maps')||q.includes('maps.app')){
-    var am=q.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-    if(am){initBeMap(parseFloat(am[1]),parseFloat(am[2]));mapGuardarCoords(parseFloat(am[1]),parseFloat(am[2]));mapReverseGeocode(parseFloat(am[1]),parseFloat(am[2]));return;}
-    var pm=q.match(/place\/([^/@]+)/);
-    if(pm)q=decodeURIComponent(pm[1].replace(/\+/g,' '));
-  }
-  mapMostrarResult('🔍 Buscando...');
-  try{
-    var d=await(await fetch('https://nominatim.openstreetmap.org/search?format=json&q='+encodeURIComponent(q)+'&limit=1&addressdetails=1',{headers:{'Accept-Language':'es'}})).json();
-    if(!d.length){mapMostrarResult('❌ No encontrado. Intenta con menos palabras.');return;}
-    var item=d[0],lat=parseFloat(item.lat),lng=parseFloat(item.lon);
-    initBeMap(lat,lng);
-    mapGuardarCoords(lat,lng);
-    mapMostrarResult('✅ '+lat.toFixed(5)+', '+lng.toFixed(5));
-  }catch(e){mapMostrarResult('❌ Error al buscar dirección');}
-}
-
-function mapDetectarPegado(){
-  var val=gv('map-buscar');
-  var cm=val.match(/(-?\d{1,3}\.\d{4,})[,\s]+(-?\d{1,3}\.\d{4,})/);
-  if(cm){initBeMap(parseFloat(cm[1]),parseFloat(cm[2]));mapGuardarCoords(parseFloat(cm[1]),parseFloat(cm[2]));mapReverseGeocode(parseFloat(cm[1]),parseFloat(cm[2]));return;}
-  var am=val.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-  if(am){initBeMap(parseFloat(am[1]),parseFloat(am[2]));mapGuardarCoords(parseFloat(am[1]),parseFloat(am[2]));mapReverseGeocode(parseFloat(am[1]),parseFloat(am[2]));return;}
-  if(val.length>15)mapBuscarDireccion();
-}
-
-async function mapReverseGeocode(lat,lng){
-  try{
-    var d=await(await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng+'&zoom=16&addressdetails=1',{headers:{'Accept-Language':'es'}})).json();
-    var addr=d.address||{};
-    var nombre=[addr.road||addr.pedestrian,addr.city||addr.town||addr.village,addr.state].filter(Boolean).join(', ');
-    if(nombre)sv('map-buscar',nombre);
-    mapMostrarResult('📍 '+lat.toFixed(5)+', '+lng.toFixed(5));
-  }catch(e){}
-}
-
-function mapMostrarResult(txt){
-  var el=document.getElementById('map-loc-result');
-  el.textContent=txt;el.style.display='block';
-  el.style.color=txt.startsWith('✅')||txt.startsWith('📍')?'var(--ok)':'var(--err)';
-}
-
-function mapAbrirStreetView(){
-  var lat=gv('map-latitud'),lng=gv('map-longitud');
-  if(!lat||!lng){toast('Primero ubica un punto en el mapa','warn');return;}
-  document.getElementById('map-sv-panel').style.display='block';
-  mapActualizarSV(parseFloat(lat),parseFloat(lng));
-  document.getElementById('mbtn-sv').className='btn btn-sm btn-primary';
-}
-
-function mapCerrarSV(){
-  document.getElementById('map-sv-panel').style.display='none';
-  document.getElementById('map-sv-iframe').src='';
-  document.getElementById('mbtn-sv').className='btn btn-sm btn-ghost';
-}
-
-function mapActualizarSV(lat,lng){
-  var panel=document.getElementById('map-sv-panel');
-  if(panel.style.display==='none')return;
-  document.getElementById('map-sv-iframe').src='https://www.google.com/maps/embed/v1/streetview?key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY&location='+lat+','+lng+'&heading=0&pitch=0&fov=90';
-}
-
-function mapUsarGPS(){
-  if(!navigator.geolocation){toast('Tu navegador no soporta geolocalización','err');return;}
-  navigator.geolocation.getCurrentPosition(function(pos){
-    var lat=pos.coords.latitude,lng=pos.coords.longitude;
-if(_beMap&&_beMarker){_beMap.setView([lat,lng],16);_beMarker.setLatLng([lat,lng]);}
-    else initBeMap(lat,lng);
-    mapGuardarCoords(lat,lng);
-    mapReverseGeocode(lat,lng);
-  },function(){toast('No se pudo obtener tu posición','err');},{enableHighAccuracy:true,timeout:8000});
-}
 function fillMapa(d){
-  sv('map-latitud',d.latitud);
-  sv('map-longitud',d.longitud);
-  sv('map-embed_url',d.embed_url||'');
-  sv('map-boton_texto',d.boton_texto);
+  sv('map-latitud',d.latitud);sv('map-longitud',d.longitud);
+  sv('map-embed_url',d.embed_url||'');sv('map-boton_texto',d.boton_texto);
   sv('map-link_directo',d.link_directo||'');
   var lat=parseFloat(d.latitud),lng=parseFloat(d.longitud);
-  setTimeout(function(){
-    if(!isNaN(lat)&&!isNaN(lng)) initBeMap(lat,lng);
-  },300);
+  function intentar(n){
+    if(typeof L!=='undefined'){initBeMap(!isNaN(lat)?lat:20.5881,!isNaN(lng)?lng:-100.3889);}
+    else if(n<30){setTimeout(function(){intentar(n+1);},150);}
+  }
+  intentar(0);
 }
+function collectMapa(){return{latitud:gv('map-latitud'),longitud:gv('map-longitud'),embed_url:gv('map-embed_url'),boton_texto:gv('map-boton_texto'),link_directo:gv('map-link_directo')};}
+
 /* ═══ COLORES ═══ */
 function loadColoresPage(){var sk=document.getElementById('col-loading'),fm=document.getElementById('col-form');if(sk)sk.style.display='block';if(fm)fm.style.display='none';apiGet('Config').then(function(d){Object.keys(COLORES_DEFAULT).forEach(function(k){var val=d['color_'+k]||COLORES_DEFAULT[k];var cp=document.getElementById('col-'+k),hx=document.getElementById('col-'+k+'-hex');if(cp)cp.value=val;if(hx)hx.value=val;});onColorChange();if(sk)sk.style.display='none';if(fm)fm.style.display='block';}).catch(function(){Object.keys(COLORES_DEFAULT).forEach(function(k){var cp=document.getElementById('col-'+k),hx=document.getElementById('col-'+k+'-hex');if(cp)cp.value=COLORES_DEFAULT[k];if(hx)hx.value=COLORES_DEFAULT[k];});onColorChange();if(sk)sk.style.display='none';if(fm)fm.style.display='block';});}
 function syncColorFromHex(key){var hx=document.getElementById('col-'+key+'-hex'),cp=document.getElementById('col-'+key);if(!hx||!cp)return;var val=hx.value.trim();if(/^#[0-9A-Fa-f]{6}$/.test(val)){cp.value=val;onColorChange();}}
@@ -1180,83 +1001,14 @@ function onColorChange(){var mi=(document.getElementById('col-morado_intenso')||
 function resetColores(){if(!confirm('¿Restaurar colores originales?'))return;Object.keys(COLORES_DEFAULT).forEach(function(k){var cp=document.getElementById('col-'+k),hx=document.getElementById('col-'+k+'-hex');if(cp)cp.value=COLORES_DEFAULT[k];if(hx)hx.value=COLORES_DEFAULT[k];});onColorChange();toast('Colores restaurados — guarda para aplicar','warn');}
 function saveColores(){if(saving)return;var data={};Object.keys(COLORES_DEFAULT).forEach(function(k){var cp=document.getElementById('col-'+k);if(cp)data['color_'+k]=cp.value;});saving=true;apiPost('Config',data).then(function(){toast('Colores guardados','ok');}).catch(function(e){toast('Error: '+e.message,'err');}).finally(function(){saving=false;});}
 
-/* ═══ VISIBILIDAD EXPANDIDA ═══ */
-function loadVisibilidadPage(){
-  var sk=document.getElementById('vis-loading'),fm=document.getElementById('vis-form');
-  if(sk)sk.style.display='block';if(fm)fm.style.display='none';
-  apiGet('Config').then(function(d){
-    VIS_SECCIONES.forEach(function(k){
-      var chk=document.getElementById('vis-'+k);
-      if(chk){chk.checked=(d[k]!=='false');syncVisRow(k,chk);}
-    });
-    if(sk)sk.style.display='none';if(fm)fm.style.display='block';
-    updateVisPreview();
-    toggleSubServicios(document.getElementById('vis-show_servicios').checked);
-  }).catch(function(){
-    VIS_SECCIONES.forEach(function(k){var chk=document.getElementById('vis-'+k);if(chk)chk.checked=true;});
-    if(sk)sk.style.display='none';if(fm)fm.style.display='block';
-    updateVisPreview();
-  });
-}
-
-function syncVisRow(key,chk){
-  var shortKey=key.replace('show_','').replace(/_/g,'-'),row=document.getElementById('vis-row-'+shortKey);
-  if(!row){
-    // Intentar también con underscore para IDs compuestos
-    var altKey=key.replace('show_','');
-    row=document.getElementById('vis-row-'+altKey);
-  }
-  if(!row)return;
-  var v=chk.checked;
-  if(v){row.classList.remove('vis-off');}
-  else{row.classList.add('vis-off');}
-}
-
-function toggleSubServicios(visible){
-  var sub=document.getElementById('vis-subservicios');
-  if(sub)sub.style.opacity=visible?'1':'0.4';
-  var subs=['show_srv_empresas','show_srv_escuelas','show_srv_infantil','show_srv_adultos','show_srv_evaluaciones'];
-  subs.forEach(function(k){
-    var chk=document.getElementById('vis-'+k);
-    if(chk)chk.disabled=!visible;
-  });
-}
-
-function updateVisPreview(){
-  var content=document.getElementById('vis-preview-content');
-  if(!content)return;
-  var items=[];
-  var previewMap={
-    show_header:'🏠 Header',show_hero:'✨ Hero',show_quienes:'👥 Quiénes somos',
-    show_servicios:'🗂️ Servicios',show_srv_empresas:'🏢',show_srv_escuelas:'🏫',
-    show_srv_infantil:'👶',show_srv_adultos:'👱',show_srv_evaluaciones:'🧠',
-    show_disponibilidad:'📅 Disponibilidad',show_mapa:'📍 Mapa',
-    show_contacto:'📞 Contacto',show_redes:'📱 Redes',
-    show_whatsapp_cta:'💬 WA',show_footer:'📄 Footer',show_formularios:'📝 Form'
-  };
-  var total=0,visible=0;
-  VIS_SECCIONES.forEach(function(k){
-    total++;
-    var chk=document.getElementById('vis-'+k);
-    var isOn=chk?chk.checked:true;
-    if(isOn)visible++;
-    var label=previewMap[k]||k;
-    items.push('<span style="display:inline-flex;align-items:center;gap:.2rem;padding:.2rem .55rem;border-radius:50px;font-size:.7rem;font-weight:600;border:1px solid '+(isOn?'var(--ok-border)':'var(--err-border)')+';background:'+(isOn?'var(--ok-bg)':'var(--err-bg)')+';color:'+(isOn?'var(--ok)':'var(--err)')+';">'+label+'</span>');
-  });
-  content.innerHTML=items.join('');
-  var counter=document.getElementById('vis-preview-counter');
-  if(counter)counter.textContent=visible+'/'+total+' visibles';
-}
-
+/* ═══ VISIBILIDAD ═══ */
+function loadVisibilidadPage(){var sk=document.getElementById('vis-loading'),fm=document.getElementById('vis-form');if(sk)sk.style.display='block';if(fm)fm.style.display='none';apiGet('Config').then(function(d){VIS_SECCIONES.forEach(function(k){var chk=document.getElementById('vis-'+k);if(chk){chk.checked=(d[k]!=='false');syncVisRow(k,chk);}});if(sk)sk.style.display='none';if(fm)fm.style.display='block';updateVisPreview();toggleSubServicios(document.getElementById('vis-show_servicios').checked);}).catch(function(){VIS_SECCIONES.forEach(function(k){var chk=document.getElementById('vis-'+k);if(chk)chk.checked=true;});if(sk)sk.style.display='none';if(fm)fm.style.display='block';updateVisPreview();});}
+function syncVisRow(key,chk){var shortKey=key.replace('show_','').replace(/_/g,'-'),row=document.getElementById('vis-row-'+shortKey);if(!row){var altKey=key.replace('show_','');row=document.getElementById('vis-row-'+altKey);}if(!row)return;chk.checked?row.classList.remove('vis-off'):row.classList.add('vis-off');}
+function toggleSubServicios(visible){var sub=document.getElementById('vis-subservicios');if(sub)sub.style.opacity=visible?'1':'0.4';['show_srv_empresas','show_srv_escuelas','show_srv_infantil','show_srv_adultos','show_srv_evaluaciones'].forEach(function(k){var chk=document.getElementById('vis-'+k);if(chk)chk.disabled=!visible;});}
+function updateVisPreview(){var content=document.getElementById('vis-preview-content');if(!content)return;var items=[],previewMap={show_header:'🏠 Header',show_hero:'✨ Hero',show_quienes:'👥 Quiénes somos',show_servicios:'🗂️ Servicios',show_srv_empresas:'🏢',show_srv_escuelas:'🏫',show_srv_infantil:'👶',show_srv_adultos:'👱',show_srv_evaluaciones:'🧠',show_disponibilidad:'📅 Disponibilidad',show_mapa:'📍 Mapa',show_contacto:'📞 Contacto',show_redes:'📱 Redes',show_whatsapp_cta:'💬 WA',show_footer:'📄 Footer',show_formularios:'📝 Form'},total=0,visible=0;VIS_SECCIONES.forEach(function(k){total++;var chk=document.getElementById('vis-'+k),isOn=chk?chk.checked:true;if(isOn)visible++;items.push('<span style="display:inline-flex;align-items:center;gap:.2rem;padding:.2rem .55rem;border-radius:50px;font-size:.7rem;font-weight:600;border:1px solid '+(isOn?'var(--ok-border)':'var(--err-border)')+';background:'+(isOn?'var(--ok-bg)':'var(--err-bg)')+';color:'+(isOn?'var(--ok)':'var(--err)')+';">'+(previewMap[k]||k)+'</span>');});content.innerHTML=items.join('');var counter=document.getElementById('vis-preview-counter');if(counter)counter.textContent=visible+'/'+total+' visibles';}
 function mostrarTodo(){VIS_SECCIONES.forEach(function(k){var chk=document.getElementById('vis-'+k);if(chk){chk.checked=true;syncVisRow(k,chk);}});updateVisPreview();toast('Todas las secciones visibles','ok');}
 function ocultarTodo(){VIS_SECCIONES.forEach(function(k){var chk=document.getElementById('vis-'+k);if(chk){chk.checked=false;syncVisRow(k,chk);}});updateVisPreview();toast('Todas las secciones ocultas','warn');}
-function saveVisibilidad(){
-  if(saving)return;
-  var data={};
-  VIS_SECCIONES.forEach(function(k){var chk=document.getElementById('vis-'+k);if(chk)data[k]=chk.checked?'true':'false';});
-  saving=true;
-  apiPost('Config',data).then(function(){toast('Visibilidad guardada','ok');}).catch(function(e){toast('Error: '+e.message,'err');}).finally(function(){saving=false;});
-}
+function saveVisibilidad(){if(saving)return;var data={};VIS_SECCIONES.forEach(function(k){var chk=document.getElementById('vis-'+k);if(chk)data[k]=chk.checked?'true':'false';});saving=true;apiPost('Config',data).then(function(){toast('Visibilidad guardada','ok');}).catch(function(e){toast('Error: '+e.message,'err');}).finally(function(){saving=false;});}
 
 /* ═══ MODAL SERVICIOS ═══ */
 function loadCurrentModal(){document.getElementById('modal-loading').style.display='block';document.getElementById('modal-form').style.display='none';setModalStatus('Cargando...','warn');apiGet(currentTab).then(function(data){fillModalForm(data);document.getElementById('modal-loading').style.display='none';document.getElementById('modal-form').style.display='block';setModalStatus('Cargado','ok');updatePreview();}).catch(function(e){document.getElementById('modal-loading').style.display='none';setModalStatus('Error','err');toast('Error al cargar '+currentTab+': '+e.message,'err');});}
@@ -1267,7 +1019,7 @@ function makeDynRow(val,type){var row=document.createElement('div');row.classNam
 function addDynItem(type){document.getElementById(type==='svc'?'m-svc-list':'m-tema-list').appendChild(makeDynRow('',type));}
 function collectModalData(){var data={titulo:gv('m-titulo'),intro:gv('m-intro'),imagen:gv('m-imagen'),badge:gv('m-badge'),servicios_titulo:gv('m-servicios_titulo'),temas_titulo:gv('m-temas_titulo'),cta_texto:gv('m-cta_texto'),cta_url:gv('m-cta_url'),modalidad:gv('m-modalidad')};for(var n=1;n<=20;n++){data['servicio_'+n]='';data['tema_'+n]='';}document.querySelectorAll('#m-svc-list input').forEach(function(inp,i){var v=inp.value.trim();if(v)data['servicio_'+(i+1)]=v;});document.querySelectorAll('#m-tema-list input').forEach(function(inp,i){var v=inp.value.trim();if(v)data['tema_'+(i+1)]=v;});return data;}
 function saveCurrentModal(){if(saving)return;if(currentUser&&currentUser.rol==='viewer'){toast('Los visores no pueden guardar.','warn');return;}saving=true;setModalStatus('Guardando...','warn');apiPost(currentTab,collectModalData()).then(function(){setModalStatus('Guardado','ok');toast(currentTab+' guardado','ok');}).catch(function(e){setModalStatus('Error','err');toast('Error: '+e.message,'err');}).finally(function(){saving=false;});}
-function updatePreview(){var titulo=gv('m-titulo')||'Titulo',intro=gv('m-intro')||'',imagen=gv('m-imagen')||'';var badge=gv('m-badge')||'',ctaTxt=gv('m-cta_texto')||'Contactar',ctaUrl=gv('m-cta_url')||'#';var svcTit=gv('m-servicios_titulo')||'Nuestros servicios:',temaTit=gv('m-temas_titulo')||'Temas:';var isEval=currentTab==='Evaluaciones';var svcs=Array.from(document.querySelectorAll('#m-svc-list input')).map(function(i){return i.value.trim();}).filter(Boolean);var temas=Array.from(document.querySelectorAll('#m-tema-list input')).map(function(i){return i.value.trim();}).filter(Boolean);var temasHTML=isEval?'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.3rem;">'+temas.map(function(t){return'<div style="background:var(--mp);border-radius:5px;padding:.28rem .5rem;font-size:.7rem;font-weight:600;color:var(--mi);border-left:3px solid var(--mi);">'+esc(t)+'</div>';}).join('')+'</div>':'<ul style="padding-left:1.15rem;">'+temas.map(function(t){return'<li style="margin-bottom:.18rem;font-size:.8rem;">'+esc(t)+'</li>';}).join('')+'</ul>';document.getElementById('pv-head').textContent=titulo;var imgHtml='';if(imagen){var fid=extractFileId(imagen);var pvSrc=fid?('https://lh3.googleusercontent.com/d/'+fid):imagen;imgHtml='<img src="'+esc(pvSrc)+'" style="width:100%;max-height:150px;object-fit:cover;border-radius:7px;margin-bottom:.75rem;display:block;" onerror="this.style.display=\'none\'">';}document.getElementById('pv-body').innerHTML=imgHtml+(badge?'<span class="pb-badge">'+esc(badge)+'</span>':'')+(intro?'<p style="font-size:.8rem;margin-bottom:.45rem;">'+esc(intro)+'</p>':'')+(svcs.length?'<span class="pb-section">'+esc(svcTit)+'</span><ul style="padding-left:1.15rem;">'+svcs.map(function(s){return'<li style="margin-bottom:.18rem;font-size:.8rem;">'+esc(s)+'</li>';}).join('')+'</ul>':'')+(temas.length?'<span class="pb-section">'+esc(temaTit)+'</span>'+temasHTML:'')+'<a href="'+esc(ctaUrl)+'" class="pb-cta" target="_blank">'+esc(ctaTxt)+'</a>';}
+function updatePreview(){var titulo=gv('m-titulo')||'Titulo',intro=gv('m-intro')||'',imagen=gv('m-imagen')||'',badge=gv('m-badge')||'',ctaTxt=gv('m-cta_texto')||'Contactar',ctaUrl=gv('m-cta_url')||'#',svcTit=gv('m-servicios_titulo')||'Nuestros servicios:',temaTit=gv('m-temas_titulo')||'Temas:',isEval=currentTab==='Evaluaciones',svcs=Array.from(document.querySelectorAll('#m-svc-list input')).map(function(i){return i.value.trim();}).filter(Boolean),temas=Array.from(document.querySelectorAll('#m-tema-list input')).map(function(i){return i.value.trim();}).filter(Boolean),temasHTML=isEval?'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.3rem;">'+temas.map(function(t){return'<div style="background:var(--mp);border-radius:5px;padding:.28rem .5rem;font-size:.7rem;font-weight:600;color:var(--mi);border-left:3px solid var(--mi);">'+esc(t)+'</div>';}).join('')+'</div>':'<ul style="padding-left:1.15rem;">'+temas.map(function(t){return'<li style="margin-bottom:.18rem;font-size:.8rem;">'+esc(t)+'</li>';}).join('')+'</ul>';document.getElementById('pv-head').textContent=titulo;var imgHtml='';if(imagen){var fid=extractFileId(imagen),pvSrc=fid?('https://lh3.googleusercontent.com/d/'+fid):imagen;imgHtml='<img src="'+esc(pvSrc)+'" style="width:100%;max-height:150px;object-fit:cover;border-radius:7px;margin-bottom:.75rem;display:block;" onerror="this.style.display=\'none\'">';}document.getElementById('pv-body').innerHTML=imgHtml+(badge?'<span class="pb-badge">'+esc(badge)+'</span>':'')+(intro?'<p style="font-size:.8rem;margin-bottom:.45rem;">'+esc(intro)+'</p>':'')+(svcs.length?'<span class="pb-section">'+esc(svcTit)+'</span><ul style="padding-left:1.15rem;">'+svcs.map(function(s){return'<li style="margin-bottom:.18rem;font-size:.8rem;">'+esc(s)+'</li>';}).join('')+'</ul>':'')+(temas.length?'<span class="pb-section">'+esc(temaTit)+'</span>'+temasHTML:'')+'<a href="'+esc(ctaUrl)+'" class="pb-cta" target="_blank">'+esc(ctaTxt)+'</a>';}
 
 /* ═══ PENDIENTES ═══ */
 function parsePendientes(data){var rows=[],i=1;while(data['id_'+i]!==undefined){if(data['id_'+i]){rows.push({idx:i,id:data['id_'+i]||'',nombre:data['nombre_'+i]||'',telefono:data['telefono_'+i]||'',correo:data['correo_'+i]||'',servicio:data['servicio_'+i]||'',motivo:data['motivo_'+i]||'',tipo:data['tipo_'+i]||'',modal:data['modal_'+i]||'',sesion:data['sesion_'+i]||'',estado:data['estado_'+i]||'Pendiente',fecha_registro:data['fecha_registro_'+i]||'',fecha_cita:data['fecha_cita_'+i]||'',hora_cita:data['hora_cita_'+i]||'',nota_cita:data['nota_cita_'+i]||'',notificado:data['notificado_'+i]||''});}i++;}return rows;}
@@ -1292,47 +1044,7 @@ function renderUsersTable(){var rL={admin:'Administrador',editor:'Editor',viewer
 function openUserModal(){['um-idx','um-nombre','um-login','um-pass'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('um-rol').value='editor';document.getElementById('um-activo').checked=true;document.getElementById('um-pass-opt').textContent='';document.getElementById('um-title').textContent='👤 Nuevo usuario';document.getElementById('um-strength').textContent='';document.getElementById('str-bar').style.width='0';document.getElementById('um-pass').type='password';document.getElementById('userModal').classList.add('show');}
 function editUser(idx){var u=usersData.find(function(u){return u.idx===idx;});if(!u)return;document.getElementById('um-title').textContent='Editar: '+u.nombre;document.getElementById('um-idx').value=idx;document.getElementById('um-nombre').value=u.nombre;document.getElementById('um-login').value=u.login;document.getElementById('um-pass').value='';document.getElementById('um-rol').value=u.rol;document.getElementById('um-activo').checked=u.activo==='true';document.getElementById('um-pass-opt').textContent='dejar vacío para no cambiar';document.getElementById('um-strength').textContent='';document.getElementById('str-bar').style.width='0';document.getElementById('um-pass').type='password';document.getElementById('userModal').classList.add('show');}
 function closeUserModal(){document.getElementById('userModal').classList.remove('show');}
-function saveUser(){
-  var idx=document.getElementById('um-idx').value,
-      nombre=document.getElementById('um-nombre').value.trim(),
-      login=document.getElementById('um-login').value.trim(),
-      pass=document.getElementById('um-pass').value,
-      rol=document.getElementById('um-rol').value,
-      activo=document.getElementById('um-activo').checked?'true':'false';
-
-  if(!nombre){toast('El nombre es obligatorio.','err');return;}
-  if(!login){toast('El login es obligatorio.','err');return;}
-  if(!/^[\w.]+$/.test(login)){toast('Login invalido: solo letras, numeros y punto.','err');return;}
-  if(!idx&&!pass){toast('La contraseña es obligatoria para nuevos usuarios.','err');return;}
-  if(pass&&pass.length<8){toast('La contraseña debe tener minimo 8 caracteres.','err');return;}
-
-  var userIdx=idx?parseInt(idx):(usersData.length>0?Math.max.apply(null,usersData.map(function(u){return u.idx;}))+1:1);
-
-  var dup=usersData.find(function(u){return u.login===login&&u.idx!==userIdx;});
-  if(dup){toast('Ya existe un usuario con ese login.','err');return;}
-
-  var sd={};
-  sd['login_'+userIdx]=login;
-  sd['nombre_'+userIdx]=nombre;
-  sd['rol_'+userIdx]=rol;
-  sd['activo_'+userIdx]=activo;
-
-  if(pass){
-    sd['pass_'+userIdx]=pass;
-  }else{
-    var userExistente=usersData.find(function(u){return u.idx===userIdx;});
-    if(userExistente&&userExistente.pass)sd['pass_'+userIdx]=userExistente.pass;
-  }
-
-  apiPost('Usuarios',sd).then(function(){
-    closeUserModal();
-    toast('Usuario guardado.','ok');
-    loadUsersPage();
-  }).catch(function(e){toast('Error: '+e.message,'err');});
-}
-
-
-  
+function saveUser(){var idx=document.getElementById('um-idx').value,nombre=document.getElementById('um-nombre').value.trim(),login=document.getElementById('um-login').value.trim(),pass=document.getElementById('um-pass').value,rol=document.getElementById('um-rol').value,activo=document.getElementById('um-activo').checked?'true':'false';if(!nombre){toast('El nombre es obligatorio.','err');return;}if(!login){toast('El login es obligatorio.','err');return;}if(!/^[\w.]+$/.test(login)){toast('Login invalido: solo letras, numeros y punto.','err');return;}if(!idx&&!pass){toast('La contraseña es obligatoria para nuevos usuarios.','err');return;}if(pass&&pass.length<8){toast('La contraseña debe tener minimo 8 caracteres.','err');return;}var userIdx=idx?parseInt(idx):(usersData.length>0?Math.max.apply(null,usersData.map(function(u){return u.idx;}))+1:1);var dup=usersData.find(function(u){return u.login===login&&u.idx!==userIdx;});if(dup){toast('Ya existe un usuario con ese login.','err');return;}var sd={};sd['login_'+userIdx]=login;sd['nombre_'+userIdx]=nombre;sd['rol_'+userIdx]=rol;sd['activo_'+userIdx]=activo;if(pass){sd['pass_'+userIdx]=pass;}else{var userExistente=usersData.find(function(u){return u.idx===userIdx;});if(userExistente&&userExistente.pass)sd['pass_'+userIdx]=userExistente.pass;}apiPost('Usuarios',sd).then(function(){closeUserModal();toast('Usuario guardado.','ok');loadUsersPage();}).catch(function(e){toast('Error: '+e.message,'err');});}
 function toggleUserActive(idx,currently){var u=usersData.find(function(u){return u.idx===idx;});if(!u)return;if(!confirm((currently?'Desactivar':'Activar')+' al usuario "'+u.nombre+'"?'))return;var d={};d['activo_'+idx]=currently?'false':'true';apiPost('Usuarios',d).then(function(){toast('Usuario '+(currently?'desactivado':'activado')+'.','warn');loadUsersPage();}).catch(function(e){toast('Error: '+e.message,'err');});}
 function checkPassStrength(){var pass=document.getElementById('um-pass').value,hint=document.getElementById('um-strength'),bar=document.getElementById('str-bar');if(!pass){hint.textContent='';bar.style.width='0';return;}var score=0;if(pass.length>=8)score++;if(pass.length>=12)score++;if(/[A-Z]/.test(pass))score++;if(/[0-9]/.test(pass))score++;if(/[^a-zA-Z0-9]/.test(pass))score++;var labels=['','Muy débil','Débil','Regular','Fuerte','Muy fuerte'],colors=['','#ef4444','#f97316','#eab308','#22c55e','#16a34a'];hint.textContent='Seguridad: '+(labels[score]||'');hint.style.color=bar.style.background=colors[score]||'';bar.style.width=(score*20)+'%';}
 
@@ -1343,11 +1055,12 @@ function setText(id,val){var e=document.getElementById(id);if(e)e.textContent=St
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function toast(msg,type){var c=document.getElementById('toasts'),t=document.createElement('div');t.className='toast';t.style.borderLeftColor=type==='ok'?'var(--ok)':type==='err'?'var(--err)':'var(--warn)';t.textContent=msg;c.appendChild(t);setTimeout(function(){t.style.opacity='0';t.style.transform='translateX(44px)';t.style.transition='.28s';setTimeout(function(){t.remove();},320);},3500);}
 if(!Promise.prototype.finally){Promise.prototype.finally=function(fn){return this.then(function(v){fn();return v;},function(e){fn();throw e;});};}
-
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeUserModal();cerrarAgenda();}});
 document.getElementById('userModal').addEventListener('click',function(e){if(e.target===this)closeUserModal();});
 document.getElementById('agendaModal').addEventListener('click',function(e){if(e.target===this)cerrarAgenda();});
 cargarLogoLogin();
 </script>
+  // termina ayuda deepseek
+
 </body>
 </html>
