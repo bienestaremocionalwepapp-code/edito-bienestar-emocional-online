@@ -336,6 +336,7 @@ input[type=color]{cursor:pointer;padding:2px;border-radius:7px;background:transp
   #selectorScreen > div > div[style*="grid"]{grid-template-columns:1fr!important;}
 }
 </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body>
 
@@ -865,7 +866,7 @@ input[type=color]{cursor:pointer;padding:2px;border-radius:7px;background:transp
 <button class="agenda-float" onclick="window.open('agenda.html','_blank')">📅 Agenda</button>
 
 <script>
-'use strict';
+
 
   'use strict';
 
@@ -1127,7 +1128,7 @@ function mapUsarGPS(){
   if(!navigator.geolocation){toast('Tu navegador no soporta geolocalización','err');return;}
   navigator.geolocation.getCurrentPosition(function(pos){
     var lat=pos.coords.latitude,lng=pos.coords.longitude;
-    if(_beMap&&_beMarker){_beMap.setView([lat,lng],16);_beMarker.setLatLng([lat,lng]);}
+if(_beMap&&_beMarker){_beMap.setView([lat,lng],16);_beMarker.setLatLng([lat,lng]);}
     else initBeMap(lat,lng);
     mapGuardarCoords(lat,lng);
     mapReverseGeocode(lat,lng);
