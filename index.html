@@ -353,7 +353,7 @@ input[type=color]{cursor:pointer;padding:2px;border-radius:7px;background:transp
       <div class="l-icon" id="l-icon-login">✏️</div>
       
       <div class="l-title">Editor de contenido</div>
-      <div class="l-sub">Bienestar Emocional mis nenas· Acceso restringido</div>
+      <div class="l-sub">Bienestar Emocional las nenas· Acceso restringido</div>
     </div>
     <div class="l-group">
       <label class="l-label">Usuario</label>
@@ -1002,8 +1002,10 @@ function initBeMap(lat,lng){
   el.style.display='block';
   document.getElementById('map-layer-btns').style.display='flex';
   var iLat=lat||20.5881, iLng=lng||(-100.3889), zoom=lat?16:13;
-  _beMap=L.map('loc-map-be').setView([iLat,iLng],zoom);
+  _beMap=L.map('loc-map-be',{zoomControl:true}).setView([iLat,iLng],zoom);
   _beLayerObj=_beLayers[_beCurrentLayer]().addTo(_beMap);
+  // FIX: invalidateSize después de que el DOM pinte el contenedor
+  setTimeout(function(){_beMap.invalidateSize();},100);
   _beMarker=L.marker([iLat,iLng],{draggable:true,icon:_beIcon()}).addTo(_beMap);
   _beMarker.on('dragend',function(){
     var p=_beMarker.getLatLng();
@@ -1012,10 +1014,10 @@ function initBeMap(lat,lng){
     mapActualizarSV(p.lat,p.lng);
   });
   _beMap.on('click',function(e){
-    _beMarker.setLatLng(e.latlng);  // ← FIX: e.latlng con mayúscula
-    mapGuardarCoords(e.latlng.lat,e.latlng.lng);  // ← FIX
-    mapReverseGeocode(e.latlng.lat,e.latlng.lng);  // ← FIX
-    mapActualizarSV(e.latlng.lat,e.latlng.lng);  // ← FIX
+    _beMarker.setLatLng(e.latlng);
+    mapGuardarCoords(e.latlng.lat,e.latlng.lng);
+    mapReverseGeocode(e.latlng.lat,e.latlng.lng);
+    mapActualizarSV(e.latlng.lat,e.latlng.lng);
   });
   if(lat) mapGuardarCoords(lat,lng);
 }
@@ -1034,9 +1036,10 @@ function mapSetLayer(type){
 }
 
 function mapGuardarCoords(lat,lng){
+  // Validar rangos válidos
+  if(lat<-90||lat>90||lng<-180||lng>180)return;
   sv('map-latitud',lat.toFixed(6));
   sv('map-longitud',lng.toFixed(6));
-  // Regenerar embed URL
   var src='https://maps.google.com/maps?q='+lat.toFixed(6)+','+lng.toFixed(6)+'&z=17&output=embed';
   sv('map-embed_url',src);
   sv('map-link_directo','https://www.google.com/maps?q='+lat.toFixed(6)+','+lng.toFixed(6));
