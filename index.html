@@ -534,7 +534,7 @@ input[type=color]{cursor:pointer;padding:2px;border-radius:7px;background:transp
           </div>
         </div>
       </div>
-<!-- ══ MAPA ══ -->
+      <!-- ══ MAPA ══ -->
 <div class="page" id="page-mapa">
   <div class="card">
     <div class="card-head">
@@ -580,7 +580,7 @@ input[type=color]{cursor:pointer;padding:2px;border-radius:7px;background:transp
         </div>
 
         <!-- Resultado geocodificación -->
-        <div id="map-loc-result" style="display:none;" class="hint" style="color:var(--ok);"></div>
+        <div id="map-loc-result" style="display:none;color:var(--ok);" class="hint"></div>
 
         <!-- Coordenadas manuales -->
         <div class="div"><span>Coordenadas</span></div>
@@ -866,6 +866,23 @@ input[type=color]{cursor:pointer;padding:2px;border-radius:7px;background:transp
 
 <script>
 'use strict';
+
+  'use strict';
+
+// ═══ LEAFLET LOADER ═══
+(function(){
+  if(typeof L !== 'undefined') return; // ya cargado
+  var script=document.createElement('script');
+  script.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  script.onload=function(){
+    console.log('✅ Leaflet listo');
+    var lat=parseFloat(gv('map-latitud'));
+    var lng=parseFloat(gv('map-longitud'));
+    if(!isNaN(lat)&&!isNaN(lng)) initBeMap(lat,lng);
+  };
+  script.onerror=function(){console.error('❌ No se pudo cargar Leaflet');};
+  document.head.appendChild(script);
+})();
 /* ═══════════════════════════════════════════════
    CONFIGURACION
 ═══════════════════════════════════════════════ */
@@ -992,14 +1009,13 @@ function initBeMap(lat,lng){
     mapActualizarSV(p.lat,p.lng);
   });
   _beMap.on('click',function(e){
-    _beMarker.setLatLng(e.latlng);
-    mapGuardarCoords(e.latlng.lat,e.latlng.lng);
-    mapReverseGeocode(e.latlng.lat,e.latlng.lng);
-    mapActualizarSV(e.latlng.lat,e.latlng.lng);
+    _beMarker.setLatLng(e.latlng);  // ← FIX: e.latlng con mayúscula
+    mapGuardarCoords(e.latlng.lat,e.latlng.lng);  // ← FIX
+    mapReverseGeocode(e.latlng.lat,e.latlng.lng);  // ← FIX
+    mapActualizarSV(e.latlng.lat,e.latlng.lng);  // ← FIX
   });
   if(lat) mapGuardarCoords(lat,lng);
 }
-
 function mapSetLayer(type){
   _beCurrentLayer=type;
   [['osm','mbtn-osm'],['satellite','mbtn-sat'],['topo','mbtn-topo']].forEach(function(pair){
@@ -1022,15 +1038,16 @@ function mapGuardarCoords(lat,lng){
   sv('map-embed_url',src);
   sv('map-link_directo','https://www.google.com/maps?q='+lat.toFixed(6)+','+lng.toFixed(6));
 }
-
 function mapActualizarDesdeCoords(){
   var lat=parseFloat(gv('map-latitud')),lng=parseFloat(gv('map-longitud'));
   if(isNaN(lat)||isNaN(lng))return;
-  if(_beMap&&_beMarker){_beMarker.setLatLng([lat,lng]);_beMap.setView([lat,lng],16);}
+  if(_beMap&&_beMarker){
+    _beMarker.setLatLng([lat,lng]);  // ← FIX: L.latLng con mayúsculas
+    _beMap.setView([lat,lng],16);
+  }
   else initBeMap(lat,lng);
   mapGuardarCoords(lat,lng);
 }
-
 function mapPreviewEmbed(){
   var src=gv('map-embed_url');
   if(!src)return;
